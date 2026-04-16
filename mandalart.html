@@ -3,198 +3,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>경제적 자유 만다라트 — 편집 가능</title>
+<title>만다라트 | Benjamin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --color-background-primary: #ffffff;
-    --color-background-secondary: #f5f4ef;
-    --color-background-tertiary: #faf9f5;
-    --color-text-primary: #2c2c2a;
-    --color-text-secondary: #5f5e5a;
-    --color-text-tertiary: #888780;
-    --color-border-tertiary: rgba(0,0,0,0.15);
-    --color-border-secondary: rgba(0,0,0,0.3);
-    --color-border-info: #378ADD;
-    --border-radius-md: 8px;
-    --border-radius-lg: 12px;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
-    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #e94560;
+    --accent-dim: rgba(233, 69, 96, 0.15);
+    --text-light: #eaeaea;
+    --text-muted: #a0a0a0;
+    --card-bg: #0f0f1a;
+    --border: rgba(233, 69, 96, 0.2);
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-background-primary: #1a1a1a;
-      --color-background-secondary: #262625;
-      --color-background-tertiary: #0f0f0f;
-      --color-text-primary: #f1efe8;
-      --color-text-secondary: #b4b2a9;
-      --color-text-tertiary: #888780;
-      --color-border-tertiary: rgba(255,255,255,0.15);
-      --color-border-secondary: rgba(255,255,255,0.3);
-    }
-  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: var(--font-sans);
-    background: var(--color-background-tertiary);
-    color: var(--color-text-primary);
-    margin: 0;
-    padding: 24px;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
     line-height: 1.5;
   }
-  .mdl-container {
-    max-width: 1100px;
+
+  .container {
+    max-width: 1200px;
     margin: 0 auto;
   }
-  h1 {
-    font-size: 20px;
-    font-weight: 500;
-    margin: 0 0 4px;
-  }
-  .subtitle {
-    color: var(--color-text-secondary);
-    font-size: 13px;
-    margin: 0 0 20px;
-  }
-  .mdl-toolbar {
+
+  /* Top bar with back button */
+  .topbar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 1rem;
+    justify-content: space-between;
     align-items: center;
-    font-size: 13px;
-    padding: 12px;
-    background: var(--color-background-primary);
-    border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
-  .mdl-toolbar button {
-    padding: 6px 14px;
-    border-radius: var(--border-radius-md);
-    border: 0.5px solid var(--color-border-secondary);
-    background: var(--color-background-primary);
-    color: var(--color-text-primary);
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.4rem;
+    background: transparent;
+    color: var(--text-light);
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
     cursor: pointer;
-    font-size: 13px;
     font-family: inherit;
   }
-  .mdl-toolbar button:hover { background: var(--color-background-secondary); }
-  .mdl-toolbar input[type="range"] { width: 140px; }
-  .mdl-toolbar label {
-    color: var(--color-text-secondary);
+
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateX(-3px);
+  }
+
+  .back-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-tag {
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .toolbar label {
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 0.85rem;
   }
-  .mdl-status {
-    font-size: 12px;
-    color: var(--color-text-tertiary);
+
+  .toolbar input[type="range"] {
+    width: 120px;
+    accent-color: var(--accent);
+  }
+
+  .toolbar button {
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .toolbar button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .toolbar button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .toolbar button.primary:hover {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .status {
+    font-size: 0.8rem;
+    color: var(--text-muted);
     margin-left: auto;
   }
-  .mdl-grid {
+
+  /* Grid */
+  .grid-wrap {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .grid {
     display: grid;
     grid-template-columns: repeat(9, minmax(0, 1fr));
-    gap: 3px;
+    gap: 4px;
+    min-width: 560px;
   }
-  .mdl-cell {
-    border-radius: var(--border-radius-md);
+
+  .cell {
+    border-radius: 8px;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 4px 3px;
-    line-height: 1.25;
+    line-height: 1.3;
     cursor: text;
     outline: none;
     word-break: keep-all;
     overflow-wrap: break-word;
-    transition: box-shadow 0.1s;
+    transition: box-shadow 0.15s, transform 0.15s;
     white-space: pre-wrap;
+    font-family: inherit;
   }
-  .mdl-cell:focus { box-shadow: 0 0 0 2px var(--color-border-info); }
-  .mdl-cell[data-role="core"] {
+
+  .cell:focus {
+    box-shadow: 0 0 0 2px var(--accent);
+    transform: scale(1.02);
+  }
+
+  .cell[data-role="core"] {
+    font-weight: 700;
+    background: var(--accent);
+    color: white;
+  }
+
+  .cell[data-role="hub"] {
     font-weight: 500;
-    background: #2C2C2A;
-    color: #F1EFE8;
   }
-  .mdl-cell[data-role="hub"] { font-weight: 500; }
-  .mdl-legend {
+
+  /* Legend */
+  .legend {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    font-size: 12px;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    justify-content: center;
   }
-  .mdl-legend span {
-    padding: 3px 10px;
-    border-radius: 999px;
+
+  .legend span {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-light);
   }
-  .mdl-hint {
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    margin-top: 0.75rem;
-    line-height: 1.6;
+
+  .legend span::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    background: var(--swatch);
   }
-  .mdl-hint code {
-    background: var(--color-background-secondary);
-    padding: 1px 6px;
+
+  /* Hint */
+  .hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    line-height: 1.7;
+    text-align: center;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hint code {
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 2px 8px;
     border-radius: 4px;
-    font-family: var(--font-mono);
-    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem 0.8rem; }
+    .toolbar { padding: 1rem; }
+    .toolbar input[type="range"] { width: 90px; }
   }
 </style>
 </head>
 <body>
 
-<div class="mdl-container">
-  <h1>경제적 자유 만다라트</h1>
-  <p class="subtitle">5년 내 월 500만원 현금흐름 시스템 · 편집하면 브라우저에 자동 저장됩니다</p>
+<div class="container">
 
-  <div class="mdl-toolbar">
-    <label>셀 크기 <input type="range" id="mdl-size" min="44" max="120" step="4" value="64" /></label>
-    <label>글자 크기 <input type="range" id="mdl-font" min="9" max="18" step="1" value="12" /></label>
-    <button id="mdl-save">저장</button>
+  <div class="topbar">
+    <a href="/" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      홈으로
+    </a>
+    <a href="/" class="logo">Benjamin</a>
+  </div>
+
+  <header>
+    <p class="section-tag">Mandalart</p>
+    <h1>경제적 자유 설계</h1>
+    <p class="subtitle">5년 내 월 500만원 현금흐름 시스템 · 편집 내용은 브라우저에 자동 저장됩니다</p>
+  </header>
+
+  <div class="toolbar">
+    <label>셀 크기 <input type="range" id="mdl-size" min="44" max="120" step="4" value="64"></label>
+    <label>글자 크기 <input type="range" id="mdl-font" min="9" max="18" step="1" value="12"></label>
+    <button id="mdl-save" class="primary">저장</button>
     <button id="mdl-reset">초기값</button>
     <button id="mdl-clear">전체 비우기</button>
     <button id="mdl-export">텍스트 복사</button>
     <button id="mdl-print">인쇄</button>
-    <span class="mdl-status" id="mdl-status"></span>
+    <span class="status" id="mdl-status"></span>
   </div>
 
-  <div class="mdl-grid" id="mdl-grid"></div>
-
-  <div class="mdl-legend">
-    <span style="background: #CECBF6; color: #26215C;">글쓰기·브랜딩 (장기자산)</span>
-    <span style="background: #B5D4F4; color: #042C53;">학습·역량</span>
-    <span style="background: #FAC775; color: #412402;">지출·저축</span>
-    <span style="background: #9FE1CB; color: #04342C;">주식·ETF (주수입)</span>
-    <span style="background: #F5C4B3; color: #4A1B0C;">본업 연봉 (주수입)</span>
-    <span style="background: #F4C0D1; color: #4B1528;">AI 사이드잡 (보조수입)</span>
-    <span style="background: #C0DD97; color: #173404;">건강·멘탈</span>
-    <span style="background: #D3D1C7; color: #2C2C2A;">시스템·루틴</span>
+  <div class="grid-wrap">
+    <div class="grid" id="mdl-grid"></div>
   </div>
 
-  <p class="mdl-hint">
-    칸을 클릭하면 바로 수정돼요. 편집 내용은 이 브라우저의 <code>localStorage</code>에 자동 저장됩니다 (같은 브라우저로 이 파일을 다시 열면 그대로 있어요).
-    다른 기기에서도 쓰려면 <code>텍스트 복사</code> 버튼으로 내보내세요.
+  <div class="legend">
+    <span style="--swatch: #b8a6e8;">글쓰기·브랜딩</span>
+    <span style="--swatch: #8fb8e8;">학습·역량</span>
+    <span style="--swatch: #e8c98f;">지출·저축</span>
+    <span style="--swatch: #8fe8c9;">주식·ETF</span>
+    <span style="--swatch: #e8a48f;">본업 연봉</span>
+    <span style="--swatch: #e88fb8;">AI 사이드잡</span>
+    <span style="--swatch: #b8e88f;">건강·멘탈</span>
+    <span style="--swatch: #c9c9c9;">시스템·루틴</span>
+  </div>
+
+  <p class="hint">
+    칸을 클릭하면 바로 수정돼요. 편집 내용은 이 브라우저에 자동으로 저장됩니다.<br>
+    다른 기기에서도 쓰려면 <code>텍스트 복사</code> 버튼을 이용하세요.
   </p>
+
+  <footer>
+    <p>© 2024 Benjamin · 경제적 자유를 향한 여정</p>
+  </footer>
+
 </div>
 
 <script>
 (function() {
-  const STORAGE_KEY = 'mandalart_ben_v1';
+  const STORAGE_KEY = 'mandalart_ben_v2';
 
   const HUB_IDS = [1, 2, 3, 4, 5, 6, 7, 8];
+  // Colors tuned to match dark navy theme - muted pastels that work on dark bg
   const HUB_META = {
-    1: { name: '글쓰기·브랜딩', bg: '#CECBF6', cellBg: '#EEEDFE', text: '#26215C' },
-    2: { name: '학습·역량',     bg: '#B5D4F4', cellBg: '#E6F1FB', text: '#042C53' },
-    3: { name: '지출·저축',     bg: '#FAC775', cellBg: '#FAEEDA', text: '#412402' },
-    4: { name: '주식·ETF 투자', bg: '#9FE1CB', cellBg: '#E1F5EE', text: '#04342C' },
-    5: { name: '본업 연봉',     bg: '#F5C4B3', cellBg: '#FAECE7', text: '#4A1B0C' },
-    6: { name: 'AI 사이드잡',   bg: '#F4C0D1', cellBg: '#FBEAF0', text: '#4B1528' },
-    7: { name: '건강·멘탈',     bg: '#C0DD97', cellBg: '#EAF3DE', text: '#173404' },
-    8: { name: '시스템·루틴',   bg: '#D3D1C7', cellBg: '#F1EFE8', text: '#2C2C2A' }
+    1: { name: '글쓰기·브랜딩', bg: '#7c6ac4', cellBg: '#2e2742', text: '#e8dfff' },
+    2: { name: '학습·역량',     bg: '#5a8bc4', cellBg: '#1f2e42', text: '#dfecff' },
+    3: { name: '지출·저축',     bg: '#c49a5a', cellBg: '#42351f', text: '#ffecdf' },
+    4: { name: '주식·ETF 투자', bg: '#5ac49a', cellBg: '#1f4235', text: '#dfffec' },
+    5: { name: '본업 연봉',     bg: '#c47a5a', cellBg: '#42281f', text: '#ffe0df' },
+    6: { name: 'AI 사이드잡',   bg: '#c45a8b', cellBg: '#421f2e', text: '#ffdfec' },
+    7: { name: '건강·멘탈',     bg: '#8bc45a', cellBg: '#2e421f', text: '#ecffdf' },
+    8: { name: '시스템·루틴',   bg: '#8b8b8b', cellBg: '#2a2a2f', text: '#e0e0e0' }
   };
 
-  // Meta grid layout: maps meta position (row,col) to hub id. Core is at (1,1).
   const META_TO_HUB = {
     '0,0': 1, '0,1': 2, '0,2': 3,
     '1,0': 4,           '1,2': 5,
@@ -202,16 +361,16 @@
   };
 
   const DEFAULTS = {
-    core: '5년 내\n경제적 자유\n월 500만원\n현금흐름',
+    core: '5년 내\n경제적 자유\n월 500만원',
     hubs: {
       1: [
         '주 2회 브런치 발행', '솔직한 직장 에세이', '자청류 독서 기록',
-        '연 1회 공모전 도전',                        '1년차 브런치북 완성',
+        '연 1회 공모전 도전',                      '1년차 브런치북 완성',
         '링크드인 영문 병행', '오프라인 모임 월 1회', '유료 뉴스레터 2년차'
       ],
       2: [
         '월 2권 재테크 독서', 'Claude·RAG 심화', '영어 협상 표현',
-        '프롬프트 엔지니어링',                     '투자 지표 해석',
+        '프롬프트 엔지니어링',                    '투자 지표 해석',
         'VIGI 제품 딥다이브', '월 1회 학습 회고', '연 1회 자격·과정'
       ],
       3: [
@@ -221,12 +380,12 @@
       ],
       4: [
         '급여일 자동매수', 'S&P500 코어 70%', '배당성장주 20%',
-        '매매일지 기록',                    '현금 10% 유지',
+        '매매일지 기록',                   '현금 10% 유지',
         '반기 리밸런싱', '배당 월 30만 목표', '감정매매 금지 규칙'
       ],
       5: [
         '성과 정량화 문서', 'HQ 영문 보고 정기', '1년내 +10% 협상',
-        '직무 확장 제안',                      '이직시장 분기 모니터',
+        '직무 확장 제안',                     '이직시장 분기 모니터',
         '팀 리드 역할 시도', 'AI 기획 커리어', '레퍼런스 관리'
       ],
       6: [
@@ -236,12 +395,12 @@
       ],
       7: [
         '주 3회 운동', '수면 7시간 고정', '연 1회 종합검진',
-        '주말 자연 노출',                 '명상 10분',
+        '주말 자연 노출',                '명상 10분',
         '단백질 식단', 'SNS 취침전 차단', '반기 심리점검'
       ],
       8: [
         '일요일 주간 회고', '월말 자산 결산', '분기별 목표 재점검',
-        '타임블록 설계',                    '디지털 디톡스 주말',
+        '타임블록 설계',                   '디지털 디톡스 주말',
         'Notion 대시보드', '감사일기 3줄', '연 1회 만다라트 갱신'
       ]
     }
@@ -255,7 +414,7 @@
         const mr = Math.floor(gr/3), mc = Math.floor(gc/3);
         const lr = gr % 3, lc = gc % 3;
         const cell = document.createElement('div');
-        cell.className = 'mdl-cell';
+        cell.className = 'cell';
         cell.contentEditable = 'true';
         cell.dataset.gr = gr;
         cell.dataset.gc = gc;
@@ -272,14 +431,14 @@
           cell.dataset.role = 'hub';
           cell.dataset.key = `echo-${hubId}`;
           cell.style.background = HUB_META[hubId].bg;
-          cell.style.color = HUB_META[hubId].text;
+          cell.style.color = '#fff';
           cell.innerText = `${hubId}. ${HUB_META[hubId].name}`;
         } else if (isCenterLocal) {
           const hubId = META_TO_HUB[`${mr},${mc}`];
           cell.dataset.role = 'hub';
           cell.dataset.key = `hub-${hubId}`;
           cell.style.background = HUB_META[hubId].bg;
-          cell.style.color = HUB_META[hubId].text;
+          cell.style.color = '#fff';
           cell.innerText = `${hubId}. ${HUB_META[hubId].name}`;
         } else {
           const hubId = META_TO_HUB[`${mr},${mc}`];
@@ -310,9 +469,9 @@
     try {
       const data = collectData();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      document.getElementById('mdl-status').textContent = '자동 저장됨 · ' + new Date().toLocaleTimeString();
+      document.getElementById('mdl-status').textContent = '저장됨 · ' + new Date().toLocaleTimeString();
     } catch (e) {
-      document.getElementById('mdl-status').textContent = '저장 실패: ' + e.message;
+      document.getElementById('mdl-status').textContent = '저장 실패';
     }
   }
 
@@ -322,7 +481,7 @@
       size: document.getElementById('mdl-size').value,
       font: document.getElementById('mdl-font').value
     };
-    document.querySelectorAll('.mdl-cell').forEach(c => {
+    document.querySelectorAll('.cell').forEach(c => {
       data.cells[c.dataset.key] = c.innerText;
     });
     return data;
@@ -334,7 +493,7 @@
       if (!raw) return;
       const data = JSON.parse(raw);
       if (data.cells) {
-        document.querySelectorAll('.mdl-cell').forEach(c => {
+        document.querySelectorAll('.cell').forEach(c => {
           if (data.cells[c.dataset.key] !== undefined) {
             c.innerText = data.cells[c.dataset.key];
           }
@@ -343,26 +502,23 @@
       if (data.size) document.getElementById('mdl-size').value = data.size;
       if (data.font) document.getElementById('mdl-font').value = data.font;
       applySize();
-      document.getElementById('mdl-status').textContent = '저장된 내용 불러옴';
-    } catch (e) {
-      // ignore
-    }
+      document.getElementById('mdl-status').textContent = '이전 작업 불러옴';
+    } catch (e) {}
   }
 
   function applySize() {
     const size = document.getElementById('mdl-size').value;
     const font = document.getElementById('mdl-font').value;
-    document.querySelectorAll('.mdl-cell').forEach(c => {
+    document.querySelectorAll('.cell').forEach(c => {
       c.style.minHeight = size + 'px';
       c.style.fontSize = font + 'px';
     });
-    const core = document.querySelector('.mdl-cell[data-role="core"]');
-    if (core) core.style.fontSize = (parseInt(font) + 1) + 'px';
+    const core = document.querySelector('.cell[data-role="core"]');
+    if (core) core.style.fontSize = (parseInt(font) + 2) + 'px';
   }
 
   document.getElementById('mdl-size').addEventListener('input', () => { applySize(); scheduleSave(); });
   document.getElementById('mdl-font').addEventListener('input', () => { applySize(); scheduleSave(); });
-
   document.getElementById('mdl-save').addEventListener('click', autoSave);
 
   document.getElementById('mdl-reset').addEventListener('click', () => {
@@ -374,7 +530,7 @@
 
   document.getElementById('mdl-clear').addEventListener('click', () => {
     if (confirm('모든 실행 과제를 비울까요? (중앙 목표와 8개 영역 이름은 유지)')) {
-      document.querySelectorAll('.mdl-cell[data-role="sub"]').forEach(c => {
+      document.querySelectorAll('.cell[data-role="sub"]').forEach(c => {
         c.innerText = '';
       });
       autoSave();
@@ -383,15 +539,15 @@
 
   document.getElementById('mdl-export').addEventListener('click', async () => {
     const lines = [];
-    const core = document.querySelector('.mdl-cell[data-role="core"]');
+    const core = document.querySelector('.cell[data-role="core"]');
     lines.push('=== 중앙 목표 ===');
     lines.push(core.innerText);
     lines.push('');
     HUB_IDS.forEach(id => {
-      const hubCell = document.querySelector(`.mdl-cell[data-key="hub-${id}"]`);
+      const hubCell = document.querySelector(`.cell[data-key="hub-${id}"]`);
       lines.push(`=== ${hubCell.innerText} ===`);
       for (let i = 0; i < 8; i++) {
-        const sc = document.querySelector(`.mdl-cell[data-key="sub-${id}-${i}"]`);
+        const sc = document.querySelector(`.cell[data-key="sub-${id}-${i}"]`);
         if (sc && sc.innerText.trim()) lines.push(`- ${sc.innerText.replace(/\n/g, ' ')}`);
       }
       lines.push('');
@@ -401,7 +557,6 @@
       await navigator.clipboard.writeText(text);
       document.getElementById('mdl-status').textContent = '클립보드에 복사됨';
     } catch {
-      // fallback: open a prompt
       prompt('아래 텍스트를 복사하세요:', text);
     }
   });
