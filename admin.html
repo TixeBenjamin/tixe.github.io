@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Benjamin Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --accent-dark: #c53650;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --text-light: #eaeaea;
+            --text-muted: #a0a0a0;
+            --card-bg: #0f0f1a;
+            --input-bg: #1e1e30;
+            --border: rgba(233, 69, 96, 0.2);
+            --border-focus: rgba(233, 69, 96, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        /* 상단 고정 바 (전체 저장 버튼 영역) */
+        .sticky-bar {
+            position: sticky;
+            top: 1rem;
+            background: rgba(15, 15, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sticky-bar .changes-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sticky-bar .changes-indicator.has-changes {
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        .sticky-bar .changes-badge {
+            background: var(--warning);
+            color: white;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* 헤더 */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-header h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        .admin-header .actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 로그인 박스 */
+        .login-box {
+            max-width: 400px;
+            margin: 5rem auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .login-box .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* 섹션 카드 */
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: var(--border-focus);
+        }
+
+        .section-card h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-card h2 .icon { margin-right: 0.5rem; }
+
+        /* 입력 필드 */
+        .form-group { margin-bottom: 1rem; }
+
+        .form-group label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* 변경됨 표시 */
+        .form-group input.modified,
+        .form-group textarea.modified,
+        .form-group select.modified {
+            border-color: var(--warning);
+            background: rgba(255, 152, 0, 0.05);
+        }
+
+        /* 아이템 카드 */
+        .item-card {
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        .item-card.modified {
+            border-color: var(--warning);
+            box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.1);
+        }
+
+        .item-card .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .item-card .item-title {
+            color: var(--accent);
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modified-badge {
+            background: var(--warning);
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+        /* 버튼 */
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #3d8b40; transform: translateY(-2px); }
+        .btn-success:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--text-muted);
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .btn-full { width: 100%; margin-top: 1rem; }
+        .btn-large { padding: 0.8rem 2rem; font-size: 1rem; }
+
+        /* 태그 */
+        .tag-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            padding: 0.5rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-height: 42px;
+        }
+
+        .tag-chip {
+            background: rgba(233, 69, 96, 0.15);
+            color: var(--accent);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .tag-chip .remove { cursor: pointer; color: var(--accent); font-weight: bold; }
+        .tag-chip .remove:hover { color: var(--danger); }
+
+        .tag-input {
+            flex: 1;
+            min-width: 100px;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            padding: 0.2rem;
+        }
+
+        /* 알림 */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            max-width: 400px;
+        }
+
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification.success { background: var(--success); }
+        .notification.error { background: var(--danger); }
+        .notification.info { background: var(--secondary); border: 1px solid var(--accent); }
+        .notification.warning { background: var(--warning); }
+
+        /* 로딩 */
+        .loading { text-align: center; padding: 2rem; color: var(--text-muted); }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            body { padding: 1rem 0.5rem; }
+            .admin-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .sticky-bar { flex-direction: column; align-items: stretch; }
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+            .login-box { margin: 2rem auto; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="notification" class="notification"></div>
+
+    <!-- 🔐 로그인 화면 -->
+    <div id="login-view" class="container">
+        <div class="login-box">
+            <h2>🔐 관리자 로그인</h2>
+            <p class="subtitle">Benjamin 포트폴리오 관리 페이지</p>
+
+            <div class="form-group">
+                <label for="login-email">이메일</label>
+                <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="login-password">비밀번호</label>
+                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button class="btn btn-primary btn-full" onclick="handleLogin()">로그인</button>
+            
+            <p style="margin-top: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                등록된 관리자만 접근 가능합니다.
+            </p>
+        </div>
+    </div>
+
+    <!-- ✏️ 편집 화면 -->
+    <div id="admin-view" class="container hidden">
+        <!-- 헤더 -->
+        <div class="admin-header">
+            <h1>✏️ 포트폴리오 관리</h1>
+            <div class="actions">
+                <span class="user-email" id="user-email"></span>
+                <a href="/" target="_blank" class="btn btn-secondary btn-small">👀 사이트 미리보기</a>
+                <button class="btn btn-secondary btn-small" onclick="handleLogout()">🚪 로그아웃</button>
+            </div>
+        </div>
+
+        <!-- 🌟 상단 고정 바: 전체 저장 -->
+        <div class="sticky-bar">
+            <div class="changes-indicator" id="changes-indicator">
+                <span id="changes-text">모든 변경사항이 저장되었습니다</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary btn-small" onclick="reloadAllData()">🔄 새로고침</button>
+                <button class="btn btn-success btn-large" id="save-all-btn" onclick="saveAll()" disabled>
+                    💾 전체 저장
+                </button>
+            </div>
+        </div>
+
+        <!-- 🎨 히어로 섹션 (신규) -->
+        <div class="section-card">
+            <h2>
+                <span><span class="icon">🎨</span>히어로 (Hero)</span>
+            </h2>
+            <div id="hero-form">
+                <div class="loading"><div class="spinner"></div> 로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- 📝 소개 -->
+        <div class="section-card">
+            <h2>
+                <span><span class="icon">📝</span>소개 (About)</span>
+            </h2>
+            <div id="about-form">
+                <div class="loading"><div class="spinner"></div> 로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- 💼 경력 -->
+        <div class="section-card">
+            <h2>
+                <span><span class="icon">💼</span>경력 (Career)</span>
+                <button class="btn btn-primary btn-small" onclick="addItem('career')">+ 추가</button>
+            </h2>
+            <div id="career-list"><div class="loading"><div class="spinner"></div> 로딩 중...</div></div>
+        </div>
+
+        <!-- 🎯 자기개발 -->
+        <div class="section-card">
+            <h2>
+                <span><span class="icon">🎯</span>자기개발 (Skills)</span>
+                <button class="btn btn-primary btn-small" onclick="addItem('skills')">+ 추가</button>
+            </h2>
+            <div id="skills-list"><div class="loading"><div class="spinner"></div> 로딩 중...</div></div>
+        </div>
+
+        <!-- 🤝 커뮤니티 -->
+        <div class="section-card">
+            <h2>
+                <span><span class="icon">🤝</span>커뮤니티 (Community)</span>
+                <button class="btn btn-primary btn-small" onclick="addItem('community')">+ 추가</button>
+            </h2>
+            <div id="community-list"><div class="loading"><div class="spinner"></div> 로딩 중...</div></div>
+        </div>
+
+        <!-- 📧 연락처 -->
+        <div class="section-card">
+            <h2>
+                <span><span class="icon">📧</span>연락처 (Contact)</span>
+                <button class="btn btn-primary btn-small" onclick="addItem('contact')">+ 추가</button>
+            </h2>
+            <div id="contact-list"><div class="loading"><div class="spinner"></div> 로딩 중...</div></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ============================================
+        // Supabase 연결
+        // ============================================
+        const SUPABASE_URL = 'https://nloebwytjunpabaphkdj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sb2Vid3l0anVucGFiYXBoa2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MzM4MDQsImV4cCI6MjA5MjQwOTgwNH0.jt_ziO3efAjCqErxFJ8OMacusAKSaCpG2YPrx9LJkS0';
+
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================
+        // 🧠 상태 관리
+        // ============================================
+        // 원본 데이터 저장 (비교용)
+        const originalData = {
+            hero: null,
+            about: null,
+            career: [],
+            skills: [],
+            community: [],
+            contact: []
+        };
+
+        // 현재 편집 중인 데이터
+        const currentData = {
+            hero: null,
+            about: null,
+            career: [],
+            skills: [],
+            community: [],
+            contact: []
+        };
+
+        // 삭제 대기 목록 (전체 저장 시 실제로 삭제됨)
+        const pendingDeletes = {
+            career: [],
+            skills: [],
+            community: [],
+            contact: []
+        };
+
+        // 새로 추가된 임시 ID 카운터
+        let tempIdCounter = -1;
+
+        // ============================================
+        // 유틸리티
+        // ============================================
+        function showNotification(message, type = 'info', duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.className = `notification ${type} show`;
+            notification.textContent = message;
+            setTimeout(() => notification.classList.remove('show'), duration);
+        }
+
+        function escapeAttr(text) {
+            if (text === null || text === undefined) return '';
+            return String(text).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function escapeText(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 깊은 복사 (JSON 방식)
+        function deepCopy(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        // ============================================
+        // 🔐 로그인/로그아웃
+        // ============================================
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showNotification('이메일과 비밀번호를 입력해주세요', 'error');
+                return;
+            }
+
+            const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                console.error('로그인 실패:', error);
+                showNotification('로그인 실패: 허가된 계정이 아닙니다', 'error');
+                return;
+            }
+
+            showNotification(`환영합니다, ${data.user.email}`, 'success');
+            showAdminView(data.user);
+        }
+
+        async function handleLogout() {
+            if (hasAnyChanges()) {
+                if (!confirm('저장하지 않은 변경사항이 있습니다. 정말 로그아웃하시겠습니까?')) return;
+            }
+            await db.auth.signOut();
+            showNotification('로그아웃되었습니다', 'info');
+            location.reload();
+        }
+
+        function showAdminView(user) {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+            document.getElementById('user-email').textContent = user.email;
+            loadAllData();
+        }
+
+        async function checkSession() {
+            const { data: { session } } = await db.auth.getSession();
+            if (session) showAdminView(session.user);
+        }
+
+        // ============================================
+        // 📥 전체 데이터 로딩
+        // ============================================
+        async function loadAllData() {
+            await Promise.all([
+                loadHero(),
+                loadAbout(),
+                loadTable('career'),
+                loadTable('skills'),
+                loadTable('community'),
+                loadTable('contact')
+            ]);
+            updateChangeIndicator();
+        }
+
+        async function reloadAllData() {
+            if (hasAnyChanges()) {
+                if (!confirm('저장하지 않은 변경사항이 사라집니다. 계속하시겠습니까?')) return;
+            }
+            // 삭제 대기 목록 초기화
+            Object.keys(pendingDeletes).forEach(k => pendingDeletes[k] = []);
+            await loadAllData();
+            showNotification('🔄 데이터 새로고침 완료', 'success');
+        }
+
+        // ============================================
+        // 🎨 Hero 섹션
+        // ============================================
+        async function loadHero() {
+            const { data, error } = await db.from('hero').select('*').limit(1).single();
+            if (error) {
+                console.error('Hero 로드 실패:', error);
+                document.getElementById('hero-form').innerHTML = 
+                    '<p style="color: var(--danger);">⚠️ Hero 테이블을 먼저 만들어주세요 (SQL 실행 필요)</p>';
+                return;
+            }
+
+            originalData.hero = deepCopy(data);
+            currentData.hero = deepCopy(data);
+            renderHero();
+        }
+
+        function renderHero() {
+            const data = currentData.hero;
+            document.getElementById('hero-form').innerHTML = `
+                <div class="form-group">
+                    <label>상단 소제목 (영문 대문자)</label>
+                    <input type="text" data-table="hero" data-field="subtitle" 
+                        value="${escapeAttr(data.subtitle || '')}" placeholder="Welcome to My Journey">
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>타이틀 앞부분</label>
+                        <input type="text" data-table="hero" data-field="title_before" 
+                            value="${escapeAttr(data.title_before || '')}" placeholder="안녕하세요, ">
+                    </div>
+                    <div class="form-group">
+                        <label>강조 이름 (빨간색)</label>
+                        <input type="text" data-table="hero" data-field="title_highlight" 
+                            value="${escapeAttr(data.title_highlight || '')}" placeholder="Benjamin">
+                    </div>
+                    <div class="form-group">
+                        <label>타이틀 뒷부분</label>
+                        <input type="text" data-table="hero" data-field="title_after" 
+                            value="${escapeAttr(data.title_after || '')}" placeholder="입니다">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>설명 (줄바꿈은 그대로 반영됩니다)</label>
+                    <textarea data-table="hero" data-field="description" rows="3">${escapeText(data.description || '')}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>버튼 1 텍스트</label>
+                        <input type="text" data-table="hero" data-field="button1_label" 
+                            value="${escapeAttr(data.button1_label || '')}" placeholder="경력 보기">
+                    </div>
+                    <div class="form-group">
+                        <label>버튼 1 링크</label>
+                        <input type="text" data-table="hero" data-field="button1_link" 
+                            value="${escapeAttr(data.button1_link || '')}" placeholder="#career">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>버튼 2 텍스트</label>
+                        <input type="text" data-table="hero" data-field="button2_label" 
+                            value="${escapeAttr(data.button2_label || '')}" placeholder="연락하기">
+                    </div>
+                    <div class="form-group">
+                        <label>버튼 2 링크</label>
+                        <input type="text" data-table="hero" data-field="button2_link" 
+                            value="${escapeAttr(data.button2_link || '')}" placeholder="#contact">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>푸터 문구</label>
+                    <input type="text" data-table="hero" data-field="footer_text" 
+                        value="${escapeAttr(data.footer_text || '')}" placeholder="© 2024 Benjamin...">
+                </div>
+            `;
+            attachChangeListeners('hero-form', 'hero');
+        }
+
+        // ============================================
+        // 📝 About 섹션
+        // ============================================
+        async function loadAbout() {
+            const { data, error } = await db.from('about').select('*').limit(1).single();
+            if (error) {
+                console.error('About 로드 실패:', error);
+                return;
+            }
+
+            originalData.about = deepCopy(data);
+            currentData.about = deepCopy(data);
+            renderAbout();
+        }
+
+        function renderAbout() {
+            const data = currentData.about;
+            document.getElementById('about-form').innerHTML = `
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" data-table="about" data-field="title" value="${escapeAttr(data.title || '')}">
+                </div>
+                <div class="form-group">
+                    <label>설명</label>
+                    <textarea data-table="about" data-field="description" rows="4">${escapeText(data.description || '')}</textarea>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>경력 (년)</label>
+                        <input type="number" data-table="about" data-field="years_of_career" value="${data.years_of_career || 0}">
+                    </div>
+                    <div class="form-group">
+                        <label>프로젝트 수</label>
+                        <input type="number" data-table="about" data-field="project_count" value="${data.project_count || 0}">
+                    </div>
+                    <div class="form-group">
+                        <label>커뮤니티 수</label>
+                        <input type="number" data-table="about" data-field="community_count" value="${data.community_count || 0}">
+                    </div>
+                </div>
+            `;
+            attachChangeListeners('about-form', 'about');
+        }
+
+        // ============================================
+        // 📋 리스트 테이블 (career/skills/community/contact)
+        // ============================================
+        async function loadTable(tableName) {
+            const { data, error } = await db.from(tableName).select('*').order('sort_order');
+            if (error) {
+                console.error(`${tableName} 로드 실패:`, error);
+                return;
+            }
+
+            originalData[tableName] = deepCopy(data);
+            currentData[tableName] = deepCopy(data);
+            renderTable(tableName);
+        }
+
+        function renderTable(tableName) {
+            const container = document.getElementById(`${tableName}-list`);
+            const items = currentData[tableName];
+
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">등록된 항목이 없습니다</p>';
+                return;
+            }
+
+            const renderFunctions = {
+                career: renderCareerItem,
+                skills: renderSkillItem,
+                community: renderCommunityItem,
+                contact: renderContactItem
+            };
+
+            container.innerHTML = items.map(item => renderFunctions[tableName](item)).join('');
+            attachChangeListeners(`${tableName}-list`, tableName);
+        }
+
+        // 각 테이블별 아이템 렌더링
+        function renderCareerItem(item) {
+            const isNew = item.id < 0;
+            return `
+                <div class="item-card" data-table="career" data-id="${item.id}">
+                    <div class="item-header">
+                        <span class="item-title">💼 경력 ${isNew ? '(신규)' : `#${item.id}`}</span>
+                        <button class="btn btn-danger" onclick="markForDelete('career', ${item.id})">🗑️ 삭제</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>기간</label>
+                            <input type="text" data-field="period" value="${escapeAttr(item.period || '')}" placeholder="예: 2023 - 현재">
+                        </div>
+                        <div class="form-group">
+                            <label>표시 순서 (작을수록 위)</label>
+                            <input type="number" data-field="sort_order" value="${item.sort_order || 0}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>직무명</label>
+                            <input type="text" data-field="title" value="${escapeAttr(item.title || '')}" placeholder="예: 시니어 엔지니어">
+                        </div>
+                        <div class="form-group">
+                            <label>회사명</label>
+                            <input type="text" data-field="company" value="${escapeAttr(item.company || '')}" placeholder="예: ABC 회사">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>설명</label>
+                        <textarea data-field="description" rows="3">${escapeText(item.description || '')}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSkillItem(item) {
+            const isNew = item.id < 0;
+            const tags = item.tags || [];
+            const tagsHtml = tags.map((tag, idx) => `
+                <span class="tag-chip">
+                    ${escapeText(tag)}
+                    <span class="remove" onclick="removeSkillTag(${item.id}, ${idx})">✕</span>
+                </span>
+            `).join('');
+
+            return `
+                <div class="item-card" data-table="skills" data-id="${item.id}">
+                    <div class="item-header">
+                        <span class="item-title">🎯 자기개발 ${isNew ? '(신규)' : `#${item.id}`}</span>
+                        <button class="btn btn-danger" onclick="markForDelete('skills', ${item.id})">🗑️ 삭제</button>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>카테고리</label>
+                            <select data-field="category">
+                                <option value="tech" ${item.category === 'tech' ? 'selected' : ''}>tech (기술)</option>
+                                <option value="learning" ${item.category === 'learning' ? 'selected' : ''}>learning (학습)</option>
+                                <option value="project" ${item.category === 'project' ? 'selected' : ''}>project (프로젝트)</option>
+                                <option value="goal" ${item.category === 'goal' ? 'selected' : ''}>goal (목표)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>아이콘 (이모지)</label>
+                            <input type="text" data-field="icon" value="${escapeAttr(item.icon || '')}" placeholder="💻">
+                        </div>
+                        <div class="form-group">
+                            <label>표시 순서</label>
+                            <input type="number" data-field="sort_order" value="${item.sort_order || 0}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>제목</label>
+                        <input type="text" data-field="title" value="${escapeAttr(item.title || '')}" placeholder="예: 기술 역량">
+                    </div>
+                    <div class="form-group">
+                        <label>설명</label>
+                        <textarea data-field="description" rows="2">${escapeText(item.description || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>태그 (엔터로 추가)</label>
+                        <div class="tag-input-wrapper" data-field="tags">
+                            ${tagsHtml}
+                            <input type="text" class="tag-input" placeholder="태그 입력 후 엔터" 
+                                onkeydown="handleTagKeydown(event, ${item.id})">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCommunityItem(item) {
+            const isNew = item.id < 0;
+            return `
+                <div class="item-card" data-table="community" data-id="${item.id}">
+                    <div class="item-header">
+                        <span class="item-title">🤝 커뮤니티 ${isNew ? '(신규)' : `#${item.id}`}</span>
+                        <button class="btn btn-danger" onclick="markForDelete('community', ${item.id})">🗑️ 삭제</button>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>아이콘 (이모지)</label>
+                            <input type="text" data-field="icon" value="${escapeAttr(item.icon || '')}" placeholder="🤝">
+                        </div>
+                        <div class="form-group">
+                            <label>역할</label>
+                            <input type="text" data-field="role" value="${escapeAttr(item.role || '')}" placeholder="예: 멤버">
+                        </div>
+                        <div class="form-group">
+                            <label>표시 순서</label>
+                            <input type="number" data-field="sort_order" value="${item.sort_order || 0}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>이름</label>
+                            <input type="text" data-field="name" value="${escapeAttr(item.name || '')}" placeholder="커뮤니티 이름">
+                        </div>
+                        <div class="form-group">
+                            <label>기간</label>
+                            <input type="text" data-field="period" value="${escapeAttr(item.period || '')}" placeholder="예: 2022 - 현재">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>설명</label>
+                        <textarea data-field="description" rows="2">${escapeText(item.description || '')}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContactItem(item) {
+            const isNew = item.id < 0;
+            return `
+                <div class="item-card" data-table="contact" data-id="${item.id}">
+                    <div class="item-header">
+                        <span class="item-title">📧 연락처 ${isNew ? '(신규)' : `#${item.id}`}</span>
+                        <button class="btn btn-danger" onclick="markForDelete('contact', ${item.id})">🗑️ 삭제</button>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>종류</label>
+                            <select data-field="channel_type">
+                                <option value="email" ${item.channel_type === 'email' ? 'selected' : ''}>email (이메일)</option>
+                                <option value="github" ${item.channel_type === 'github' ? 'selected' : ''}>github (깃허브)</option>
+                                <option value="linkedin" ${item.channel_type === 'linkedin' ? 'selected' : ''}>linkedin (링크드인)</option>
+                                <option value="other" ${item.channel_type === 'other' ? 'selected' : ''}>other (기타)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>표시 이름</label>
+                            <input type="text" data-field="label" value="${escapeAttr(item.label || '')}" placeholder="예: 이메일">
+                        </div>
+                        <div class="form-group">
+                            <label>표시 순서</label>
+                            <input type="number" data-field="sort_order" value="${item.sort_order || 0}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>URL (이메일은 mailto:로 시작)</label>
+                        <input type="text" data-field="url" value="${escapeAttr(item.url || '')}" placeholder="https://... 또는 mailto:...">
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // 🎯 변경 감지 & 상태 동기화
+        // ============================================
+        function attachChangeListeners(containerId, tableName) {
+            const container = document.getElementById(containerId);
+            const inputs = container.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                // change/input 이벤트 모두 듣기 (select 대응)
+                ['input', 'change'].forEach(eventType => {
+                    input.addEventListener(eventType, () => {
+                        syncFormToState(container, tableName);
+                        updateChangeIndicator();
+                    });
+                });
+            });
+        }
+
+        // 폼 값을 currentData에 반영
+        function syncFormToState(container, tableName) {
+            if (tableName === 'hero' || tableName === 'about') {
+                // 단일 레코드 (form만 있음)
+                const inputs = container.querySelectorAll('[data-field]');
+                inputs.forEach(input => {
+                    const field = input.dataset.field;
+                    let value = input.value;
+                    if (input.type === 'number') value = parseInt(value) || 0;
+                    currentData[tableName][field] = value;
+                });
+            } else {
+                // 리스트 (item-card 여러 개)
+                const cards = container.querySelectorAll(`.item-card[data-table="${tableName}"]`);
+                cards.forEach(card => {
+                    const id = parseInt(card.dataset.id);
+                    const item = currentData[tableName].find(x => x.id === id);
+                    if (!item) return;
+
+                    const inputs = card.querySelectorAll('[data-field]');
+                    inputs.forEach(input => {
+                        const field = input.dataset.field;
+                        if (field === 'tags') return;  // 태그는 별도 처리
+                        let value = input.value;
+                        if (input.type === 'number') value = parseInt(value) || 0;
+                        item[field] = value;
+                    });
+
+                    // 태그 수집 (skills 전용)
+                    if (tableName === 'skills') {
+                        const tags = Array.from(card.querySelectorAll('.tag-chip'))
+                            .map(chip => chip.childNodes[0].textContent.trim())
+                            .filter(t => t.length > 0);
+                        item.tags = tags;
+                    }
+                });
+            }
+        }
+
+        // ============================================
+        // ➕ 항목 추가 (임시 ID로)
+        // ============================================
+        function addItem(tableName) {
+            // 폼 상태 먼저 동기화 (다른 데이터 잃지 않도록)
+            syncFormToState(document.getElementById(`${tableName}-list`), tableName);
+
+            const templates = {
+                career: { period: '신규 경력', title: '새 직무', company: '회사명', description: '', sort_order: 99 },
+                skills: { category: 'tech', icon: '📌', title: '새 항목', description: '', tags: [], sort_order: 99 },
+                community: { icon: '🤝', name: '새 활동', role: '역할', period: '기간', description: '', sort_order: 99 },
+                contact: { channel_type: 'other', label: '새 연락처', url: 'https://', sort_order: 99 }
+            };
+
+            const newItem = { id: tempIdCounter--, ...templates[tableName], _isNew: true };
+            currentData[tableName].push(newItem);
+            renderTable(tableName);
+            updateChangeIndicator();
+            showNotification('✨ 새 항목 추가됨 (전체 저장 필요)', 'info');
+        }
+
+        // ============================================
+        // 🗑️ 항목 삭제 대기
+        // ============================================
+        function markForDelete(tableName, id) {
+            if (!confirm('정말 삭제하시겠습니까? (전체 저장 시 최종 삭제됩니다)')) return;
+
+            // 폼 상태 먼저 동기화
+            syncFormToState(document.getElementById(`${tableName}-list`), tableName);
+
+            // 신규 추가 항목이면 그냥 제거
+            if (id < 0) {
+                currentData[tableName] = currentData[tableName].filter(x => x.id !== id);
+            } else {
+                // 기존 항목이면 삭제 대기 목록에 추가
+                pendingDeletes[tableName].push(id);
+                currentData[tableName] = currentData[tableName].filter(x => x.id !== id);
+            }
+
+            renderTable(tableName);
+            updateChangeIndicator();
+        }
+
+        // ============================================
+        // 🏷️ 태그 처리 (Skills)
+        // ============================================
+        function handleTagKeydown(event, skillId) {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+
+            const input = event.target;
+            const tag = input.value.trim();
+            if (!tag) return;
+
+            const card = input.closest('.item-card');
+            const item = currentData.skills.find(x => x.id === skillId);
+            if (!item) return;
+
+            if (!item.tags) item.tags = [];
+            item.tags.push(tag);
+
+            renderTable('skills');
+            updateChangeIndicator();
+        }
+
+        function removeSkillTag(skillId, tagIdx) {
+            syncFormToState(document.getElementById('skills-list'), 'skills');
+            const item = currentData.skills.find(x => x.id === skillId);
+            if (!item || !item.tags) return;
+            item.tags.splice(tagIdx, 1);
+            renderTable('skills');
+            updateChangeIndicator();
+        }
+
+        // ============================================
+        // 🔔 변경사항 카운터
+        // ============================================
+        function hasAnyChanges() {
+            return countChanges() > 0;
+        }
+
+        function countChanges() {
+            let count = 0;
+
+            // hero, about 변경 체크
+            ['hero', 'about'].forEach(table => {
+                if (!originalData[table] || !currentData[table]) return;
+                if (JSON.stringify(originalData[table]) !== JSON.stringify(currentData[table])) count++;
+            });
+
+            // 리스트 테이블 변경 체크
+            ['career', 'skills', 'community', 'contact'].forEach(table => {
+                const original = originalData[table] || [];
+                const current = currentData[table] || [];
+
+                // 신규/수정 항목
+                current.forEach(item => {
+                    if (item.id < 0) {
+                        count++;  // 신규
+                    } else {
+                        const orig = original.find(x => x.id === item.id);
+                        if (orig && JSON.stringify(orig) !== JSON.stringify(item)) count++;
+                    }
+                });
+
+                // 삭제 대기
+                count += pendingDeletes[table].length;
+            });
+
+            return count;
+        }
+
+        function updateChangeIndicator() {
+            const count = countChanges();
+            const indicator = document.getElementById('changes-indicator');
+            const text = document.getElementById('changes-text');
+            const btn = document.getElementById('save-all-btn');
+
+            if (count === 0) {
+                indicator.classList.remove('has-changes');
+                text.textContent = '✅ 모든 변경사항이 저장되었습니다';
+                btn.disabled = true;
+            } else {
+                indicator.classList.add('has-changes');
+                text.innerHTML = `<span class="changes-badge">${count}</span> 개의 저장되지 않은 변경사항`;
+                btn.disabled = false;
+            }
+        }
+
+        // ============================================
+        // 💾 전체 저장 (핵심!)
+        // ============================================
+        async function saveAll() {
+            const btn = document.getElementById('save-all-btn');
+            btn.disabled = true;
+            btn.textContent = '💾 저장 중...';
+
+            // 현재 폼 상태를 모두 동기화
+            syncFormToState(document.getElementById('hero-form'), 'hero');
+            syncFormToState(document.getElementById('about-form'), 'about');
+            ['career', 'skills', 'community', 'contact'].forEach(t => {
+                syncFormToState(document.getElementById(`${t}-list`), t);
+            });
+
+            const results = { success: 0, failed: 0, errors: [] };
+
+            try {
+                // 1. Hero 업데이트
+                if (currentData.hero && JSON.stringify(originalData.hero) !== JSON.stringify(currentData.hero)) {
+                    const { id, updated_at, ...updateData } = currentData.hero;
+                    updateData.updated_at = new Date().toISOString();
+                    const { error } = await db.from('hero').update(updateData).eq('id', id);
+                    if (error) { results.failed++; results.errors.push('Hero: ' + error.message); }
+                    else results.success++;
+                }
+
+                // 2. About 업데이트
+                if (currentData.about && JSON.stringify(originalData.about) !== JSON.stringify(currentData.about)) {
+                    const { id, updated_at, ...updateData } = currentData.about;
+                    updateData.updated_at = new Date().toISOString();
+                    const { error } = await db.from('about').update(updateData).eq('id', id);
+                    if (error) { results.failed++; results.errors.push('About: ' + error.message); }
+                    else results.success++;
+                }
+
+                // 3. 리스트 테이블 처리
+                for (const tableName of ['career', 'skills', 'community', 'contact']) {
+                    // 3-1. 삭제 먼저 처리
+                    for (const id of pendingDeletes[tableName]) {
+                        const { error } = await db.from(tableName).delete().eq('id', id);
+                        if (error) { results.failed++; results.errors.push(`${tableName} 삭제 #${id}: ${error.message}`); }
+                        else results.success++;
+                    }
+
+                    // 3-2. 신규 INSERT / 기존 UPDATE
+                    for (const item of currentData[tableName]) {
+                        if (item.id < 0) {
+                            // 신규 추가
+                            const { id, _isNew, ...insertData } = item;
+                            const { error } = await db.from(tableName).insert(insertData);
+                            if (error) { results.failed++; results.errors.push(`${tableName} 추가: ${error.message}`); }
+                            else results.success++;
+                        } else {
+                            // 기존 수정 체크
+                            const orig = originalData[tableName].find(x => x.id === item.id);
+                            if (orig && JSON.stringify(orig) !== JSON.stringify(item)) {
+                                const { id, created_at, ...updateData } = item;
+                                const { error } = await db.from(tableName).update(updateData).eq('id', id);
+                                if (error) { results.failed++; results.errors.push(`${tableName} 수정 #${id}: ${error.message}`); }
+                                else results.success++;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('저장 중 예외 발생:', e);
+                results.errors.push('예외: ' + e.message);
+                results.failed++;
+            }
+
+            // 결과 알림
+            if (results.failed === 0) {
+                showNotification(`✅ ${results.success}개 항목 저장 완료!`, 'success', 4000);
+            } else {
+                showNotification(
+                    `⚠️ 성공 ${results.success}, 실패 ${results.failed}. Console에서 에러 확인`, 
+                    'warning', 
+                    5000
+                );
+                console.error('저장 실패 상세:', results.errors);
+            }
+
+            // 상태 초기화 및 데이터 재로딩
+            Object.keys(pendingDeletes).forEach(k => pendingDeletes[k] = []);
+            await loadAllData();
+
+            btn.textContent = '💾 전체 저장';
+        }
+
+        // ============================================
+        // 🚪 창 닫을 때 변경사항 경고
+        // ============================================
+        window.addEventListener('beforeunload', (e) => {
+            if (hasAnyChanges()) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // ============================================
+        // ⌨️ 단축키: Ctrl+S 전체 저장
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (hasAnyChanges()) saveAll();
+            }
+        });
+
+        // ============================================
+        // 엔터로 로그인
+        // ============================================
+        document.getElementById('login-password').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        // ============================================
+        // 🚀 시작
+        // ============================================
+        checkSession();
+    </script>
+</body>
+</html>
