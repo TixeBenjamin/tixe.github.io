@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시간표 | Benjamin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #e94560;
+    --accent-dim: rgba(233, 69, 96, 0.15);
+    --text-light: #eaeaea;
+    --text-muted: #a0a0a0;
+    --card-bg: #0f0f1a;
+    --border: rgba(233, 69, 96, 0.2);
+
+    --cat-exercise: #e8a48f;  --cat-exercise-bg: #42281f;
+    --cat-work:     #5a8bc4;  --cat-work-bg:     #1f2e42;
+    --cat-side:     #e94560;  --cat-side-bg:     #421f2e;
+    --cat-content:  #c49a5a;  --cat-content-bg:  #42351f;
+    --cat-personal: #e8b574;  --cat-personal-bg: #42361f;
+    --cat-review:   #8b8b8b;  --cat-review-bg:   #2a2a2f;
+    --cat-free:     #7c6ac4;  --cat-free-bg:     #2e2742;
+    --cat-rest:     #5ac49a;  --cat-rest-bg:     #1f4235;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+  }
+
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.4rem; background: transparent; color: var(--text-light);
+    border: 1.5px solid var(--border); border-radius: 50px;
+    text-decoration: none; font-size: 0.9rem; cursor: pointer;
+    font-family: inherit; transition: all 0.3s ease;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateX(-3px); }
+  .back-btn svg { width: 16px; height: 16px; }
+
+  .logo {
+    font-family: 'Playfair Display', serif; font-size: 1.5rem;
+    font-weight: 700; color: var(--accent); text-decoration: none;
+  }
+
+  header { text-align: center; margin-bottom: 2rem; }
+  .section-tag {
+    color: var(--accent); font-size: 0.85rem; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; margin-bottom: 0.8rem;
+  }
+  .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+  .tabs {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 1.5rem;
+  }
+  .tab {
+    padding: 0.6rem 1.6rem; border-radius: 50px;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text-light); cursor: pointer; font-size: 0.9rem;
+    font-family: inherit; transition: all 0.2s ease;
+  }
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 1.2rem 1.5rem; background: var(--card-bg);
+    border: 1px solid var(--border); border-radius: 15px;
+    margin-bottom: 1.5rem; font-size: 0.85rem;
+  }
+  .toolbar label { color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+  .toolbar input[type="range"] { width: 100px; accent-color: var(--accent); }
+  .toolbar button {
+    padding: 0.5rem 1.1rem; border-radius: 50px;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text-light); cursor: pointer; font-size: 0.85rem;
+    font-family: inherit; transition: all 0.2s ease;
+  }
+  .toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+  .toolbar button.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .toolbar button.primary:hover { background: transparent; color: var(--accent); }
+  .status { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+
+  .grid-wrap {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1rem; overflow-x: auto;
+  }
+
+  .week-nav, .month-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1rem; padding: 0 0.5rem; gap: 0.5rem;
+  }
+  .week-nav h2, .month-nav h2 {
+    font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 600;
+  }
+  .week-nav h2 .range { color: var(--text-muted); font-weight: 400; font-size: 0.95rem; margin-left: 8px; }
+  .week-nav button, .month-nav button {
+    padding: 0.4rem 1rem; border-radius: 50px; border: 1.5px solid var(--border);
+    background: transparent; color: var(--text-light); cursor: pointer;
+    font-family: inherit; font-size: 0.85rem; transition: all 0.2s;
+  }
+  .week-nav button:hover, .month-nav button:hover { border-color: var(--accent); color: var(--accent); }
+  .week-nav .today-btn { border-color: var(--accent); color: var(--accent); }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: 80px repeat(7, minmax(0, 1fr));
+    gap: 3px;
+    min-width: 800px;
+  }
+
+  .day-head {
+    background: var(--secondary); border-radius: 8px;
+    padding: 8px 6px; text-align: center; font-weight: 500;
+    font-size: 0.78rem; color: var(--text-light); letter-spacing: 0.05em;
+  }
+  .day-head .num {
+    display: block; font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--accent); margin-top: 2px;
+  }
+  .day-head.is-today { background: var(--accent); color: white; }
+  .day-head.is-today .num { color: white; }
+
+  .time-head {
+    background: var(--secondary); border-radius: 8px;
+    padding: 8px 6px; font-size: 0.7rem; color: var(--text-muted);
+    text-align: center; display: flex; flex-direction: column;
+    justify-content: center; line-height: 1.3;
+  }
+  .time-head strong { color: var(--text-light); font-weight: 500; display: block; font-size: 0.8rem; }
+
+  .month-grid {
+    display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px; min-width: 720px;
+  }
+
+  .cell {
+    border-radius: 6px; padding: 6px 8px; line-height: 1.3;
+    cursor: text; outline: none; word-break: keep-all;
+    overflow-wrap: break-word; transition: box-shadow 0.15s, transform 0.15s;
+    white-space: pre-wrap; font-family: inherit;
+    background: rgba(255,255,255,0.03); color: var(--text-light);
+    border: 1px solid transparent; position: relative;
+    overflow: hidden;
+  }
+  .cell:focus {
+    box-shadow: 0 0 0 2px var(--accent); transform: scale(1.01);
+    z-index: 3; overflow: visible;
+  }
+  .cell:empty:before {
+    content: attr(data-placeholder); color: var(--text-muted);
+    opacity: 0.3; font-size: 0.75em;
+  }
+
+  .week-cell.is-starred {
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+  }
+  .week-cell.is-starred:after {
+    content: '★';
+    position: absolute; top: 2px; right: 4px;
+    font-size: 9px; color: var(--accent);
+    pointer-events: none;
+  }
+
+  .cell.cat-exercise { background: var(--cat-exercise-bg); color: var(--cat-exercise); border-left: 3px solid var(--cat-exercise); }
+  .cell.cat-work     { background: var(--cat-work-bg);     color: var(--cat-work);     border-left: 3px solid var(--cat-work); }
+  .cell.cat-side     { background: var(--cat-side-bg);     color: var(--cat-side);     border-left: 3px solid var(--cat-side); }
+  .cell.cat-content  { background: var(--cat-content-bg);  color: var(--cat-content);  border-left: 3px solid var(--cat-content); }
+  .cell.cat-personal { background: var(--cat-personal-bg); color: var(--cat-personal); border-left: 3px solid var(--cat-personal); }
+  .cell.cat-review   { background: var(--cat-review-bg);   color: var(--cat-review);   border-left: 3px solid var(--cat-review); }
+  .cell.cat-free     { background: var(--cat-free-bg);     color: var(--cat-free);     border-left: 3px solid var(--cat-free); }
+  .cell.cat-rest     { background: var(--cat-rest-bg);     color: var(--cat-rest);     border-left: 3px solid var(--cat-rest); }
+
+  .week-cell .overflow-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    pointer-events: none; opacity: 0.4;
+    border-left: 3px solid var(--ov-color, transparent);
+    background: var(--ov-color, transparent);
+    z-index: 0;
+  }
+  .week-cell { z-index: 1; }
+  .week-cell > * { position: relative; z-index: 2; }
+
+  .month-cell {
+    min-height: 100px; position: relative;
+    display: flex; flex-direction: column; padding: 6px 7px;
+  }
+  .month-cell .date-num {
+    font-family: 'Playfair Display', serif; font-size: 0.95rem;
+    color: var(--text-muted); margin-bottom: 4px; font-weight: 600;
+  }
+  .month-cell.today .date-num { color: var(--accent); }
+  .month-cell.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .month-cell.other-month { opacity: 0.35; }
+
+  .month-cell .auto-items {
+    display: flex; flex-direction: column; gap: 2px;
+    margin-bottom: 4px;
+  }
+  .month-cell .auto-tag {
+    font-size: 0.7rem; padding: 2px 6px; border-radius: 4px;
+    line-height: 1.3; word-break: keep-all; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .month-cell .auto-tag.cat-exercise { background: var(--cat-exercise-bg); color: var(--cat-exercise); border-left: 2px solid var(--cat-exercise); }
+  .month-cell .auto-tag.cat-work     { background: var(--cat-work-bg);     color: var(--cat-work);     border-left: 2px solid var(--cat-work); }
+  .month-cell .auto-tag.cat-side     { background: var(--cat-side-bg);     color: var(--cat-side);     border-left: 2px solid var(--cat-side); }
+  .month-cell .auto-tag.cat-content  { background: var(--cat-content-bg);  color: var(--cat-content);  border-left: 2px solid var(--cat-content); }
+  .month-cell .auto-tag.cat-personal { background: var(--cat-personal-bg); color: var(--cat-personal); border-left: 2px solid var(--cat-personal); }
+  .month-cell .auto-tag.cat-review   { background: var(--cat-review-bg);   color: var(--cat-review);   border-left: 2px solid var(--cat-review); }
+  .month-cell .auto-tag.cat-free     { background: var(--cat-free-bg);     color: var(--cat-free);     border-left: 2px solid var(--cat-free); }
+  .month-cell .auto-tag.cat-rest     { background: var(--cat-rest-bg);     color: var(--cat-rest);     border-left: 2px solid var(--cat-rest); }
+  .month-cell .auto-tag.no-cat { background: rgba(233,69,96,0.1); color: var(--accent); border-left: 2px solid var(--accent); }
+
+  .month-cell .memo {
+    flex: 1; font-size: 0.75rem; line-height: 1.35;
+    outline: none; cursor: text; word-break: keep-all;
+    overflow-wrap: break-word; white-space: pre-wrap;
+    color: var(--text-muted);
+  }
+  .month-cell .memo:empty:before {
+    content: '+'; color: var(--text-muted); opacity: 0.3; font-size: 0.9rem;
+  }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 1.5rem; justify-content: center;
+  }
+  .legend span {
+    padding: 4px 12px; border-radius: 50px; font-size: 0.75rem;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+    color: var(--text-light);
+  }
+  .legend span::before {
+    content: ''; display: inline-block; width: 10px; height: 10px;
+    border-radius: 50%; margin-right: 6px; vertical-align: middle;
+    background: var(--swatch);
+  }
+
+  .hint {
+    font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem;
+    line-height: 1.8; text-align: center; max-width: 800px;
+    margin-left: auto; margin-right: auto;
+  }
+  .hint code {
+    background: var(--accent-dim); color: var(--accent);
+    padding: 2px 8px; border-radius: 4px; font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+  }
+  .hint strong { color: var(--text-light); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  footer {
+    text-align: center; margin-top: 3rem; padding-top: 2rem;
+    color: var(--text-muted); font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem 0.8rem; }
+    .toolbar { padding: 1rem; }
+    .toolbar input[type="range"] { width: 80px; }
+    .month-cell { min-height: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="topbar">
+    <a href="/" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      홈으로
+    </a>
+    <a href="/" class="logo">Benjamin</a>
+  </div>
+
+  <header>
+    <p class="section-tag">Schedule</p>
+    <h1>시간표 · 루틴</h1>
+    <p class="subtitle">하루 06:00–23:00 · 1시간 단위 · 편집 내용은 브라우저에 자동 저장됩니다</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-view="week">주간</button>
+    <button class="tab" data-view="month">월간</button>
+  </div>
+
+  <div class="toolbar">
+    <label>셀 높이 <input type="range" id="sch-size" min="38" max="80" step="2" value="46"></label>
+    <label>글자 <input type="range" id="sch-font" min="10" max="14" step="1" value="11"></label>
+    <button id="sch-save" class="primary">저장</button>
+    <button id="sch-reset">이번주 초기값</button>
+    <button id="sch-clear">전체 비우기</button>
+    <button id="sch-export">텍스트 복사</button>
+    <button id="sch-print">인쇄</button>
+    <span class="status" id="sch-status"></span>
+  </div>
+
+  <!-- WEEKLY VIEW -->
+  <div class="view active" id="view-week">
+    <div class="week-nav">
+      <button id="week-prev">← 이전 주</button>
+      <h2 id="week-title">— <span class="range"></span></h2>
+      <div style="display:flex; gap:6px;">
+        <button id="week-today" class="today-btn">오늘</button>
+        <button id="week-next">다음 주 →</button>
+      </div>
+    </div>
+    <div class="grid-wrap">
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+  </div>
+
+  <!-- MONTHLY VIEW -->
+  <div class="view" id="view-month">
+    <div class="month-nav">
+      <button id="month-prev">← 이전</button>
+      <h2 id="month-title">2026년 4월</h2>
+      <button id="month-next">다음 →</button>
+    </div>
+    <div class="grid-wrap">
+      <div class="month-grid" id="month-grid"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span style="--swatch: #e8a48f;">운동</span>
+    <span style="--swatch: #5a8bc4;">본업</span>
+    <span style="--swatch: #e94560;">부업</span>
+    <span style="--swatch: #c49a5a;">콘텐츠</span>
+    <span style="--swatch: #e8b574;">개인일과</span>
+    <span style="--swatch: #7c6ac4;">자유·약속</span>
+    <span style="--swatch: #8b8b8b;">리뷰·정리</span>
+    <span style="--swatch: #5ac49a;">수면·휴식</span>
+  </div>
+
+  <p class="hint">
+    <strong>⏱️ 시간 자동 확장</strong> — 셀에 <code>18:00-19:30</code> 같은 시간 패턴을 넣으면, 다음 시간대 셀 위쪽에 그만큼의 띠가 자동으로 그려져요.<br>
+    <strong>⭐ 월간 자동 표시</strong> — 주간 셀에 <code>⭐</code> 또는 <code>!</code> 를 넣으면 그날 월간 캘린더에 자동 표시됩니다 (예: <code>⭐ 14:00 미팅</code>).<br>
+    <strong>🎨 자동 색상</strong> — <code>운동</code>, <code>부업</code>, <code>식사</code> 등 키워드가 포함되면 카테고리 색이 자동 적용돼요.
+  </p>
+
+  <footer>
+    <p>© 2026 Benjamin · Personal Operating System</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'schedule_ben_v3';
+
+  // 06:00 ~ 22:00 (17 slots, 1-hour each)
+  const TIME_SLOTS = [];
+  for (let h = 6; h <= 22; h++) {
+    TIME_SLOTS.push({
+      id: String(h).padStart(2,'0') + ':00',
+      hour: h,
+      label: String(h).padStart(2,'0') + ':00',
+      sub: String(h+1).padStart(2,'0') + ':00'
+    });
+  }
+
+  const DAYS = [
+    { short:'MON', kr:'월' },{ short:'TUE', kr:'화' },{ short:'WED', kr:'수' },
+    { short:'THU', kr:'목' },{ short:'FRI', kr:'금' },{ short:'SAT', kr:'토' },{ short:'SUN', kr:'일' }
+  ];
+
+  // Specific keywords first
+  const KEYWORD_MAP = [
+    { cat:'side',     words:['부업','사이드','외주'] },
+    { cat:'content',  words:['콘텐츠','인스타','IG','스토리','피드','촬영','편집','유튜브'] },
+    { cat:'exercise', words:['운동','헬스','러닝','요가','필라테스','스트레칭'] },
+    { cat:'review',   words:['리뷰','회고','결산','점검'] },
+    { cat:'rest',     words:['수면','취침','잠','낮잠'] },
+    { cat:'personal', words:['식사','아침','점심','저녁','씻기','샤워','이동','통근','출근','퇴근','준비'] },
+    { cat:'work',     words:['본업','회사','업무','미팅','근무'] },
+    { cat:'free',     words:['자유','약속','소모임','독서','취미','데이트','휴식'] }
+  ];
+
+  const CAT_COLORS = {
+    exercise:'#e8a48f', work:'#5a8bc4', side:'#e94560', content:'#c49a5a',
+    personal:'#e8b574', review:'#8b8b8b', free:'#7c6ac4', rest:'#5ac49a'
+  };
+
+  const ROUTINE = {
+    '06:00': ['🏋️ 운동','🏋️ 운동','🏋️ 운동','🏋️ 운동','🏋️ 운동','',''],
+    '07:00': ['씻기·아침','씻기·아침','씻기·아침','씻기·아침','씻기·아침','아침','아침'],
+    '08:00': ['이동','이동','이동','이동','이동','',''],
+    '09:00': ['본업','본업','본업','본업','본업','💼 부업 deep','자유'],
+    '10:00': ['본업','본업','본업','본업','본업','💼 부업 deep','자유'],
+    '11:00': ['본업','본업','본업','본업','본업','💼 부업 deep','자유'],
+    '12:00': ['점심','점심','점심','점심','점심','💼 부업 deep','점심'],
+    '13:00': ['본업','본업','본업','본업','본업','자유','자유'],
+    '14:00': ['본업','본업','본업','본업','본업','자유','자유'],
+    '15:00': ['본업','본업','본업','본업','본업','자유','자유'],
+    '16:00': ['본업','본업','본업','본업','본업','자유','자유'],
+    '17:00': ['본업','본업','본업','본업','본업','자유','자유'],
+    '18:00': ['🍽️ 저녁 18:00-19:30','🍽️ 저녁 18:00-19:30','🍽️ 저녁 18:00-19:30','🍽️ 저녁 18:00-19:30','🍽️ 저녁 18:00-19:30','🍽️ 저녁 18:00-19:30','🍽️ 저녁 18:00-19:30'],
+    '19:00': ['💼 부업','📱 콘텐츠','약속·휴식','💼 부업','약속·휴식','소모임','🔁 주간 리뷰'],
+    '20:00': ['💼 부업','📱 콘텐츠','약속·휴식','💼 부업','약속·휴식','소모임','📱 콘텐츠'],
+    '21:00': ['수면 준비','수면 준비','수면 준비','수면 준비','수면 준비','수면 준비','수면 준비'],
+    '22:00': ['수면','수면','수면','수면','수면','수면','수면']
+  };
+
+  // === Date utils ===
+  function getMonday(d) {
+    const date = new Date(d);
+    const day = date.getDay() || 7;
+    if (day !== 1) date.setHours(-24*(day-1));
+    date.setHours(0,0,0,0);
+    return date;
+  }
+  function fmtDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  function fmtShort(d) { return `${d.getMonth()+1}/${d.getDate()}`; }
+  function isSameDate(a,b) { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+  function detectCategory(text) {
+    const lower = text.toLowerCase();
+    for (const m of KEYWORD_MAP)
+      for (const w of m.words)
+        if (lower.includes(w.toLowerCase())) return m.cat;
+    return null;
+  }
+
+  function applyCategory(cell) {
+    const text = cell.innerText || '';
+    cell.classList.remove('cat-exercise','cat-work','cat-side','cat-content','cat-personal','cat-review','cat-free','cat-rest');
+    const cat = detectCategory(text);
+    if (cat) cell.classList.add('cat-' + cat);
+    if (text.includes('⭐') || text.includes('!')) cell.classList.add('is-starred');
+    else cell.classList.remove('is-starred');
+  }
+
+  function parseTimeRange(text) {
+    const m = text.match(/(\d{1,2}):(\d{2})\s*[-~–]\s*(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    const startMin = +m[1]*60 + +m[2];
+    const endMin   = +m[3]*60 + +m[4];
+    if (endMin <= startMin) return null;
+    return { startMin, endMin };
+  }
+
+  function recomputeOverflows() {
+    document.querySelectorAll('.week-cell .overflow-bar').forEach(b => b.remove());
+    document.querySelectorAll('.week-cell').forEach(cell => {
+      const text = cell.innerText || '';
+      const tr = parseTimeRange(text);
+      if (!tr) return;
+      const slotHour = parseInt(cell.dataset.slot.split(':')[0], 10);
+      const slotStart = slotHour * 60;
+      if (tr.startMin < slotStart || tr.startMin >= slotStart + 60) return;
+      const date = cell.dataset.date;
+      const cat = detectCategory(text);
+      const color = cat ? CAT_COLORS[cat] : 'var(--accent)';
+      let cur = slotStart + 60;
+      while (cur < tr.endMin) {
+        const nextHour = Math.floor(cur / 60);
+        const nextSlotId = String(nextHour).padStart(2,'0') + ':00';
+        const nextCell = document.querySelector(`.week-cell[data-date="${date}"][data-slot="${nextSlotId}"]`);
+        if (!nextCell) break;
+        const slotEnd = cur + 60;
+        const fillEnd = Math.min(tr.endMin, slotEnd);
+        const fillPct = ((fillEnd - cur) / 60) * 100;
+        const bar = document.createElement('div');
+        bar.className = 'overflow-bar';
+        bar.style.height = fillPct + '%';
+        bar.style.setProperty('--ov-color', color);
+        nextCell.appendChild(bar);
+        cur += 60;
+      }
+    });
+  }
+
+  // === Storage ===
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { cells: {}, size: null, font: null };
+      const data = JSON.parse(raw);
+      return { cells: data.cells || {}, size: data.size, font: data.font };
+    } catch (e) { return { cells: {}, size: null, font: null }; }
+  }
+
+  let saveTimer = null;
+  function scheduleSave() {
+    document.getElementById('sch-status').textContent = '편집 중…';
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(autoSave, 800);
+  }
+
+  function autoSave() {
+    try {
+      const data = readStore();
+      document.querySelectorAll('.week-cell').forEach(c => {
+        const txt = c.innerText;
+        if (txt && txt.trim()) data.cells[c.dataset.key] = txt;
+        else delete data.cells[c.dataset.key];
+      });
+      document.querySelectorAll('.month-cell .memo').forEach(m => {
+        const txt = m.innerText;
+        if (txt && txt.trim()) data.cells[m.dataset.key] = txt;
+        else delete data.cells[m.dataset.key];
+      });
+      data.size = document.getElementById('sch-size').value;
+      data.font = document.getElementById('sch-font').value;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      document.getElementById('sch-status').textContent = '저장됨 · ' + new Date().toLocaleTimeString();
+    } catch(e) {
+      document.getElementById('sch-status').textContent = '저장 실패';
+    }
+  }
+
+  function applySize() {
+    const size = document.getElementById('sch-size').value;
+    const font = document.getElementById('sch-font').value;
+    document.querySelectorAll('.week-cell').forEach(c => {
+      c.style.minHeight = size + 'px';
+      c.style.fontSize = font + 'px';
+    });
+    document.querySelectorAll('.month-cell').forEach(c => {
+      c.style.minHeight = (parseInt(size) + 50) + 'px';
+    });
+    document.querySelectorAll('.month-cell .memo').forEach(m => {
+      m.style.fontSize = (parseInt(font) - 1) + 'px';
+    });
+  }
+
+  // === Week View ===
+  let weekStart;
+
+  function buildWeekGrid() {
+    const grid = document.getElementById('week-grid');
+    grid.innerHTML = '';
+
+    const dates = [];
+    for (let i=0; i<7; i++) {
+      const d = new Date(weekStart);
+      d.setDate(weekStart.getDate() + i);
+      dates.push(d);
+    }
+    const last = dates[6];
+    document.getElementById('week-title').innerHTML =
+      `${weekStart.getFullYear()}년 ${weekStart.getMonth()+1}월 ` +
+      `<span class="range">${fmtShort(weekStart)} – ${fmtShort(last)}</span>`;
+
+    const corner = document.createElement('div');
+    corner.className = 'time-head';
+    corner.innerHTML = '<strong>TIME</strong>';
+    grid.appendChild(corner);
+
+    const today = new Date();
+    DAYS.forEach((d, i) => {
+      const dh = document.createElement('div');
+      dh.className = 'day-head';
+      if (isSameDate(dates[i], today)) dh.classList.add('is-today');
+      dh.innerHTML = `${d.short}<span class="num">${dates[i].getMonth()+1}/${dates[i].getDate()}</span>`;
+      grid.appendChild(dh);
+    });
+
+    TIME_SLOTS.forEach(slot => {
+      const th = document.createElement('div');
+      th.className = 'time-head';
+      th.innerHTML = `<strong>${slot.label}</strong>${slot.sub}`;
+      grid.appendChild(th);
+
+      DAYS.forEach((d, di) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell week-cell';
+        cell.contentEditable = 'true';
+        const dateStr = fmtDate(dates[di]);
+        cell.dataset.key = `week-${dateStr}-${slot.id}`;
+        cell.dataset.date = dateStr;
+        cell.dataset.slot = slot.id;
+        cell.dataset.day = di;
+        cell.dataset.placeholder = '+';
+        cell.addEventListener('input', () => {
+          applyCategory(cell);
+          scheduleSave();
+          recomputeOverflows();
+        });
+        grid.appendChild(cell);
+      });
+    });
+
+    applyDataToWeek();
+    applySize();
+    recomputeOverflows();
+  }
+
+  function applyDataToWeek() {
+    const stored = readStore();
+    document.querySelectorAll('.week-cell').forEach(cell => {
+      const k = cell.dataset.key;
+      const day = parseInt(cell.dataset.day, 10);
+      const slot = cell.dataset.slot;
+      let val = stored.cells[k];
+      if (val === undefined) {
+        val = ROUTINE[slot] ? (ROUTINE[slot][day] || '') : '';
+      }
+      cell.innerText = val;
+      applyCategory(cell);
+    });
+  }
+
+  // === Month View ===
+  let viewYear, viewMonth;
+
+  function buildMonthGrid() {
+    const grid = document.getElementById('month-grid');
+    const title = document.getElementById('month-title');
+    grid.innerHTML = '';
+    title.textContent = `${viewYear}년 ${viewMonth + 1}월`;
+
+    DAYS.forEach(d => {
+      const dh = document.createElement('div');
+      dh.className = 'day-head';
+      dh.innerHTML = `${d.short}<span class="num">${d.kr}</span>`;
+      grid.appendChild(dh);
+    });
+
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    const lastDay = new Date(viewYear, viewMonth + 1, 0);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = lastDay.getDate();
+    const prevLast = new Date(viewYear, viewMonth, 0).getDate();
+    const today = new Date();
+
+    for (let i = startOffset - 1; i >= 0; i--)
+      grid.appendChild(createMonthCell(viewYear, viewMonth-1, prevLast - i, true, today));
+    for (let d = 1; d <= daysInMonth; d++)
+      grid.appendChild(createMonthCell(viewYear, viewMonth, d, false, today));
+    const total = startOffset + daysInMonth;
+    const trailing = (7 - (total % 7)) % 7;
+    for (let i = 1; i <= trailing; i++)
+      grid.appendChild(createMonthCell(viewYear, viewMonth+1, i, true, today));
+
+    applySize();
+  }
+
+  function createMonthCell(y, m, d, isOther, today) {
+    const date = new Date(y, m, d);
+    const dateStr = fmtDate(date);
+    const cell = document.createElement('div');
+    cell.className = 'cell month-cell';
+    if (isOther) cell.classList.add('other-month');
+    if (isSameDate(date, today)) cell.classList.add('today');
+
+    const dateNum = document.createElement('div');
+    dateNum.className = 'date-num';
+    dateNum.textContent = d;
+    cell.appendChild(dateNum);
+
+    const auto = document.createElement('div');
+    auto.className = 'auto-items';
+    const items = getStarredItemsForDate(dateStr);
+    items.forEach(it => {
+      const tag = document.createElement('div');
+      tag.className = 'auto-tag' + (it.cat ? ' cat-' + it.cat : ' no-cat');
+      tag.textContent = `${it.slot.replace(':00','')}시 ${it.text}`;
+      tag.title = `${it.slot} ${it.text}`;
+      auto.appendChild(tag);
+    });
+    cell.appendChild(auto);
+
+    const memo = document.createElement('div');
+    memo.className = 'memo';
+    memo.contentEditable = 'true';
+    memo.dataset.key = `month-${dateStr}`;
+    const stored = readStore();
+    if (stored.cells[memo.dataset.key]) memo.innerText = stored.cells[memo.dataset.key];
+    memo.addEventListener('input', () => { scheduleSave(); });
+    cell.appendChild(memo);
+
+    return cell;
+  }
+
+  function getStarredItemsForDate(dateStr) {
+    const stored = readStore();
+    const items = [];
+    TIME_SLOTS.forEach(slot => {
+      const k = `week-${dateStr}-${slot.id}`;
+      const text = stored.cells[k];
+      if (text && (text.includes('⭐') || text.includes('!'))) {
+        const clean = text.replace(/[⭐!]/g, '').trim();
+        items.push({ slot: slot.id, text: clean, cat: detectCategory(text) });
+      }
+    });
+    return items;
+  }
+
+  // === Tabs ===
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const v = t.dataset.view;
+      document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+      document.getElementById('view-' + v).classList.add('active');
+      if (v === 'month') buildMonthGrid();
+    });
+  });
+
+  // === Toolbar ===
+  document.getElementById('sch-size').addEventListener('input', () => { applySize(); scheduleSave(); });
+  document.getElementById('sch-font').addEventListener('input', () => { applySize(); scheduleSave(); });
+  document.getElementById('sch-save').addEventListener('click', autoSave);
+
+  document.getElementById('sch-reset').addEventListener('click', () => {
+    if (!confirm('현재 보고 있는 주를 초기 루틴으로 되돌릴까요?')) return;
+    const data = readStore();
+    document.querySelectorAll('.week-cell').forEach(c => { delete data.cells[c.dataset.key]; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    applyDataToWeek();
+    recomputeOverflows();
+    autoSave();
+  });
+
+  document.getElementById('sch-clear').addEventListener('click', () => {
+    const v = document.querySelector('.tab.active').dataset.view;
+    if (v === 'week') {
+      if (!confirm('이 주의 시간표를 모두 비울까요?')) return;
+      document.querySelectorAll('.week-cell').forEach(c => { c.innerText=''; applyCategory(c); });
+      recomputeOverflows();
+      autoSave();
+    } else {
+      if (!confirm('이 달의 메모를 모두 비울까요?')) return;
+      document.querySelectorAll('.month-cell .memo').forEach(m => { m.innerText=''; });
+      autoSave();
+    }
+  });
+
+  document.getElementById('sch-export').addEventListener('click', async () => {
+    const lines = [];
+    const last = new Date(weekStart); last.setDate(weekStart.getDate()+6);
+    lines.push(`=== 주간 (${fmtDate(weekStart)} ~ ${fmtDate(last)}) ===\n`);
+    TIME_SLOTS.forEach(slot => {
+      const row = [`[${slot.label}]`];
+      DAYS.forEach((d, i) => {
+        const c = document.querySelector(`.week-cell[data-slot="${slot.id}"][data-day="${i}"]`);
+        const txt = c ? c.innerText.trim() : '';
+        if (txt) row.push(`${d.kr}: ${txt.replace(/\n/g,' ')}`);
+      });
+      if (row.length > 1) lines.push(row.join('  '));
+    });
+    lines.push(`\n=== ${viewYear}년 ${viewMonth+1}월 메모 ===`);
+    document.querySelectorAll('.month-cell:not(.other-month)').forEach(c => {
+      const num = c.querySelector('.date-num').textContent;
+      const memo = c.querySelector('.memo').innerText.trim();
+      const tags = Array.from(c.querySelectorAll('.auto-tag')).map(t => t.textContent);
+      if (memo || tags.length) {
+        lines.push(`${num}일: ${tags.join(' · ')}${memo ? ' / 메모: ' + memo.replace(/\n/g,' ') : ''}`);
+      }
+    });
+    const text = lines.join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      document.getElementById('sch-status').textContent = '클립보드에 복사됨';
+    } catch {
+      prompt('아래 텍스트를 복사하세요:', text);
+    }
+  });
+
+  document.getElementById('sch-print').addEventListener('click', () => window.print());
+
+  // === Week nav ===
+  document.getElementById('week-prev').addEventListener('click', () => {
+    weekStart.setDate(weekStart.getDate() - 7);
+    buildWeekGrid();
+  });
+  document.getElementById('week-next').addEventListener('click', () => {
+    weekStart.setDate(weekStart.getDate() + 7);
+    buildWeekGrid();
+  });
+  document.getElementById('week-today').addEventListener('click', () => {
+    weekStart = getMonday(new Date());
+    buildWeekGrid();
+  });
+
+  // === Month nav ===
+  document.getElementById('month-prev').addEventListener('click', () => {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    buildMonthGrid();
+  });
+  document.getElementById('month-next').addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    buildMonthGrid();
+  });
+
+  // === Init ===
+  const now = new Date();
+  weekStart = getMonday(now);
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+
+  const stored = readStore();
+  if (stored.size) document.getElementById('sch-size').value = stored.size;
+  if (stored.font) document.getElementById('sch-font').value = stored.font;
+
+  buildWeekGrid();
+  buildMonthGrid();
+})();
+</script>
+
+</body>
+</html>
