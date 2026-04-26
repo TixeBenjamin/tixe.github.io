@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시간표 | Benjamin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #e94560;
+    --accent-dim: rgba(233, 69, 96, 0.15);
+    --text-light: #eaeaea;
+    --text-muted: #a0a0a0;
+    --card-bg: #0f0f1a;
+    --border: rgba(233, 69, 96, 0.2);
+
+    /* Category colors */
+    --cat-exercise: #e8a48f;
+    --cat-exercise-bg: #42281f;
+    --cat-work: #5a8bc4;
+    --cat-work-bg: #1f2e42;
+    --cat-side: #e94560;
+    --cat-side-bg: #421f2e;
+    --cat-content: #c49a5a;
+    --cat-content-bg: #42351f;
+    --cat-review: #8b8b8b;
+    --cat-review-bg: #2a2a2f;
+    --cat-free: #7c6ac4;
+    --cat-free-bg: #2e2742;
+    --cat-rest: #5ac49a;
+    --cat-rest-bg: #1f4235;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.4rem;
+    background: transparent;
+    color: var(--text-light);
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateX(-3px);
+  }
+
+  .back-btn svg { width: 16px; height: 16px; }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .section-tag {
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab {
+    padding: 0.6rem 1.6rem;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .toolbar label {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+
+  .toolbar input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+
+  .toolbar button {
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .toolbar button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .toolbar button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .toolbar button.primary:hover {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .status {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  /* Grid wrap */
+  .grid-wrap {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  /* Weekly grid */
+  .week-grid {
+    display: grid;
+    grid-template-columns: 90px repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    min-width: 720px;
+  }
+
+  .day-head {
+    background: var(--secondary);
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+  }
+
+  .day-head .num {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
+  .time-head {
+    background: var(--secondary);
+    border-radius: 8px;
+    padding: 10px 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.3;
+  }
+
+  .time-head strong {
+    color: var(--text-light);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Month grid */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    min-width: 720px;
+  }
+
+  .month-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .month-nav h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .month-nav button {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .month-nav button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Cell — shared */
+  .cell {
+    border-radius: 8px;
+    text-align: left;
+    padding: 8px 10px;
+    line-height: 1.35;
+    cursor: text;
+    outline: none;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    transition: box-shadow 0.15s, transform 0.15s;
+    white-space: pre-wrap;
+    font-family: inherit;
+    background: rgba(255,255,255,0.03);
+    color: var(--text-light);
+    border: 1px solid transparent;
+  }
+
+  .cell:focus {
+    box-shadow: 0 0 0 2px var(--accent);
+    transform: scale(1.01);
+    z-index: 2;
+    position: relative;
+  }
+
+  .cell:empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    opacity: 0.4;
+    font-size: 0.8em;
+  }
+
+  /* Category colors */
+  .cell.cat-exercise { background: var(--cat-exercise-bg); color: var(--cat-exercise); border-left: 3px solid var(--cat-exercise); }
+  .cell.cat-work { background: var(--cat-work-bg); color: var(--cat-work); border-left: 3px solid var(--cat-work); }
+  .cell.cat-side { background: var(--cat-side-bg); color: var(--cat-side); border-left: 3px solid var(--cat-side); }
+  .cell.cat-content { background: var(--cat-content-bg); color: var(--cat-content); border-left: 3px solid var(--cat-content); }
+  .cell.cat-review { background: var(--cat-review-bg); color: var(--cat-review); border-left: 3px solid var(--cat-review); }
+  .cell.cat-free { background: var(--cat-free-bg); color: var(--cat-free); border-left: 3px solid var(--cat-free); }
+  .cell.cat-rest { background: var(--cat-rest-bg); color: var(--cat-rest); border-left: 3px solid var(--cat-rest); }
+
+  /* Month cell — date display */
+  .month-cell {
+    min-height: 90px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .month-cell .date-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .month-cell.today .date-num {
+    color: var(--accent);
+  }
+
+  .month-cell.today {
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+  }
+
+  .month-cell.other-month {
+    opacity: 0.35;
+  }
+
+  .month-cell .memo {
+    flex: 1;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    outline: none;
+    cursor: text;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  .month-cell .memo:empty:before {
+    content: '+';
+    color: var(--text-muted);
+    opacity: 0.3;
+    font-size: 1rem;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+    justify-content: center;
+  }
+
+  .legend span {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-light);
+  }
+
+  .legend span::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    background: var(--swatch);
+  }
+
+  /* Hint */
+  .hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    line-height: 1.7;
+    text-align: center;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hint code {
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+  }
+
+  /* View switching */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem 0.8rem; }
+    .toolbar { padding: 1rem; }
+    .toolbar input[type="range"] { width: 80px; }
+    .month-cell { min-height: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="topbar">
+    <a href="/" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      홈으로
+    </a>
+    <a href="/" class="logo">Benjamin</a>
+  </div>
+
+  <header>
+    <p class="section-tag">Schedule</p>
+    <h1>시간표 · 루틴</h1>
+    <p class="subtitle">매일을 잘 사는 게 아니라, 무너져도 돌아오는 구조 · 편집 내용은 브라우저에 자동 저장됩니다</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-view="week">주간</button>
+    <button class="tab" data-view="month">월간</button>
+  </div>
+
+  <div class="toolbar">
+    <label>셀 크기 <input type="range" id="sch-size" min="50" max="120" step="5" value="68"></label>
+    <label>글자 크기 <input type="range" id="sch-font" min="10" max="16" step="1" value="12"></label>
+    <button id="sch-save" class="primary">저장</button>
+    <button id="sch-reset">초기값</button>
+    <button id="sch-clear">전체 비우기</button>
+    <button id="sch-export">텍스트 복사</button>
+    <button id="sch-print">인쇄</button>
+    <span class="status" id="sch-status"></span>
+  </div>
+
+  <!-- WEEKLY VIEW -->
+  <div class="view active" id="view-week">
+    <div class="grid-wrap">
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+  </div>
+
+  <!-- MONTHLY VIEW -->
+  <div class="view" id="view-month">
+    <div class="month-nav">
+      <button id="month-prev">← 이전</button>
+      <h2 id="month-title">2026년 4월</h2>
+      <button id="month-next">다음 →</button>
+    </div>
+    <div class="grid-wrap">
+      <div class="month-grid" id="month-grid"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span style="--swatch: #e8a48f;">운동</span>
+    <span style="--swatch: #5a8bc4;">본업</span>
+    <span style="--swatch: #e94560;">부업</span>
+    <span style="--swatch: #c49a5a;">콘텐츠</span>
+    <span style="--swatch: #7c6ac4;">자유·약속</span>
+    <span style="--swatch: #8b8b8b;">리뷰·정리</span>
+    <span style="--swatch: #5ac49a;">수면·휴식</span>
+  </div>
+
+  <p class="hint">
+    셀을 클릭해 자유롭게 편집하세요. 텍스트에 <code>운동</code>, <code>부업</code>, <code>콘텐츠</code> 등 키워드가 들어가면 색상이 자동으로 바뀝니다.<br>
+    편집 내용은 이 브라우저에 자동 저장돼요.
+  </p>
+
+  <footer>
+    <p>© 2026 Benjamin · Personal Operating System</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'schedule_ben_v1';
+
+  // Time slots for weekly view
+  const TIME_SLOTS = [
+    { id: 'morning', label: '06:30', sub: '08:30' },
+    { id: 'work-am', label: '09:00', sub: '13:00' },
+    { id: 'work-pm', label: '13:00', sub: '18:00' },
+    { id: 'evening', label: '19:30', sub: '21:30' },
+    { id: 'night',   label: '21:30', sub: '23:00' },
+  ];
+  const DAYS = [
+    { short: 'MON', kr: '월' },
+    { short: 'TUE', kr: '화' },
+    { short: 'WED', kr: '수' },
+    { short: 'THU', kr: '목' },
+    { short: 'FRI', kr: '금' },
+    { short: 'SAT', kr: '토' },
+    { short: 'SUN', kr: '일' }
+  ];
+
+  // Keyword → category mapping for auto-coloring
+  const KEYWORD_MAP = [
+    { cat: 'exercise', words: ['운동', '헬스', '러닝', '요가', '필라테스', '스트레칭'] },
+    { cat: 'work',     words: ['본업', '회사', '출근', '업무', '미팅', '근무'] },
+    { cat: 'side',     words: ['부업', '사이드', 'side', '외주'] },
+    { cat: 'content',  words: ['콘텐츠', '인스타', 'IG', '스토리', '피드', '촬영', '편집', '유튜브'] },
+    { cat: 'review',   words: ['리뷰', '회고', '정리', '결산', '점검'] },
+    { cat: 'free',     words: ['자유', '약속', '소모임', '독서', '취미', '데이트'] },
+    { cat: 'rest',     words: ['수면', '취침', '잠', '휴식', '낮잠', '쉬는'] }
+  ];
+
+  function detectCategory(text) {
+    const lower = text.toLowerCase();
+    for (const m of KEYWORD_MAP) {
+      for (const w of m.words) {
+        if (lower.includes(w.toLowerCase())) return m.cat;
+      }
+    }
+    return null;
+  }
+
+  function applyCategory(cell) {
+    const text = cell.innerText || '';
+    cell.classList.remove('cat-exercise', 'cat-work', 'cat-side', 'cat-content', 'cat-review', 'cat-free', 'cat-rest');
+    const cat = detectCategory(text);
+    if (cat) cell.classList.add('cat-' + cat);
+  }
+
+  // Default weekly routine
+  const WEEK_DEFAULTS = {
+    'morning-0': '🏋️ 운동 + 스토리',
+    'morning-1': '🏋️ 운동 + 스토리',
+    'morning-2': '🏋️ 운동 + 스토리',
+    'morning-3': '🏋️ 운동 + 스토리',
+    'morning-4': '🏋️ 운동',
+    'morning-5': '자유',
+    'morning-6': '자유',
+
+    'work-am-0': '본업', 'work-am-1': '본업', 'work-am-2': '본업', 'work-am-3': '본업', 'work-am-4': '본업',
+    'work-am-5': '💼 부업 deep',
+    'work-am-6': '자유',
+
+    'work-pm-0': '본업', 'work-pm-1': '본업', 'work-pm-2': '본업', 'work-pm-3': '본업', 'work-pm-4': '본업',
+    'work-pm-5': '자유',
+    'work-pm-6': '자유',
+
+    'evening-0': '💼 부업 2h',
+    'evening-1': '📱 콘텐츠 batch',
+    'evening-2': '약속 / 휴식',
+    'evening-3': '💼 부업 2h',
+    'evening-4': '약속 / 휴식',
+    'evening-5': '소모임 / 약속',
+    'evening-6': '🔁 주간 리뷰',
+
+    'night-0': '수면', 'night-1': '수면', 'night-2': '수면', 'night-3': '수면',
+    'night-4': '수면', 'night-5': '수면',
+    'night-6': '📱 콘텐츠 정리'
+  };
+
+  function buildWeekGrid() {
+    const grid = document.getElementById('week-grid');
+    grid.innerHTML = '';
+
+    // Top-left empty corner
+    const corner = document.createElement('div');
+    corner.className = 'time-head';
+    corner.innerHTML = '<strong>TIME</strong>';
+    grid.appendChild(corner);
+
+    // Day headers
+    DAYS.forEach((d, i) => {
+      const dh = document.createElement('div');
+      dh.className = 'day-head';
+      dh.innerHTML = `${d.short}<span class="num">${d.kr}</span>`;
+      grid.appendChild(dh);
+    });
+
+    // Rows: time → 7 day cells
+    TIME_SLOTS.forEach((slot, ri) => {
+      const th = document.createElement('div');
+      th.className = 'time-head';
+      th.innerHTML = `<strong>${slot.label}</strong>${slot.sub}`;
+      grid.appendChild(th);
+
+      DAYS.forEach((d, ci) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell week-cell';
+        cell.contentEditable = 'true';
+        cell.dataset.key = `${slot.id}-${ci}`;
+        cell.dataset.placeholder = '+';
+        const def = WEEK_DEFAULTS[`${slot.id}-${ci}`] || '';
+        cell.innerText = def;
+        applyCategory(cell);
+        cell.addEventListener('input', () => {
+          applyCategory(cell);
+          scheduleSave();
+        });
+        grid.appendChild(cell);
+      });
+    });
+
+    applySize();
+  }
+
+  // Monthly view
+  let viewYear, viewMonth; // 0-indexed month
+
+  function buildMonthGrid() {
+    const grid = document.getElementById('month-grid');
+    const title = document.getElementById('month-title');
+    grid.innerHTML = '';
+
+    const today = new Date();
+    title.textContent = `${viewYear}년 ${viewMonth + 1}월`;
+
+    // Day-of-week headers (월~일)
+    DAYS.forEach(d => {
+      const dh = document.createElement('div');
+      dh.className = 'day-head';
+      dh.innerHTML = `${d.short}<span class="num">${d.kr}</span>`;
+      grid.appendChild(dh);
+    });
+
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    const lastDay = new Date(viewYear, viewMonth + 1, 0);
+    // Convert Sun=0..Sat=6 → Mon=0..Sun=6
+    let startOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = lastDay.getDate();
+
+    // Previous month tail
+    const prevLast = new Date(viewYear, viewMonth, 0).getDate();
+    for (let i = startOffset - 1; i >= 0; i--) {
+      const d = prevLast - i;
+      const cell = createMonthCell(viewYear, viewMonth - 1, d, true, today);
+      grid.appendChild(cell);
+    }
+
+    // Current month
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = createMonthCell(viewYear, viewMonth, d, false, today);
+      grid.appendChild(cell);
+    }
+
+    // Fill trailing cells (next month)
+    const total = startOffset + daysInMonth;
+    const trailing = (7 - (total % 7)) % 7;
+    for (let i = 1; i <= trailing; i++) {
+      const cell = createMonthCell(viewYear, viewMonth + 1, i, true, today);
+      grid.appendChild(cell);
+    }
+
+    applySize();
+  }
+
+  function createMonthCell(y, m, d, isOther, today) {
+    // Normalize date (handles m=-1 or m=12)
+    const date = new Date(y, m, d);
+    const yy = date.getFullYear();
+    const mm = date.getMonth();
+    const dd = date.getDate();
+    const key = `month-${yy}-${String(mm+1).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+
+    const cell = document.createElement('div');
+    cell.className = 'cell month-cell';
+    if (isOther) cell.classList.add('other-month');
+    if (yy === today.getFullYear() && mm === today.getMonth() && dd === today.getDate()) {
+      cell.classList.add('today');
+    }
+
+    const dateNum = document.createElement('div');
+    dateNum.className = 'date-num';
+    dateNum.textContent = dd;
+    cell.appendChild(dateNum);
+
+    const memo = document.createElement('div');
+    memo.className = 'memo';
+    memo.contentEditable = 'true';
+    memo.dataset.key = key;
+    memo.addEventListener('input', () => {
+      applyCategory(cell);
+      scheduleSave();
+    });
+    cell.appendChild(memo);
+
+    return cell;
+  }
+
+  // Save / Load
+  let saveTimer = null;
+  function scheduleSave() {
+    document.getElementById('sch-status').textContent = '편집 중…';
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(autoSave, 800);
+  }
+
+  function autoSave() {
+    try {
+      const data = collectData();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      document.getElementById('sch-status').textContent = '저장됨 · ' + new Date().toLocaleTimeString();
+    } catch (e) {
+      document.getElementById('sch-status').textContent = '저장 실패';
+    }
+  }
+
+  function collectData() {
+    // Read existing month data and merge with current
+    let existing = {};
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) existing = JSON.parse(raw);
+    } catch(e) {}
+
+    const data = {
+      week: existing.week || {},
+      month: existing.month || {},
+      size: document.getElementById('sch-size').value,
+      font: document.getElementById('sch-font').value
+    };
+
+    // Week cells
+    document.querySelectorAll('.week-cell').forEach(c => {
+      data.week[c.dataset.key] = c.innerText;
+    });
+    // Month cells (only currently rendered ones — but we keep history)
+    document.querySelectorAll('.month-cell .memo').forEach(m => {
+      data.month[m.dataset.key] = m.innerText;
+    });
+
+    return data;
+  }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+
+      // Apply week
+      if (data.week) {
+        document.querySelectorAll('.week-cell').forEach(c => {
+          if (data.week[c.dataset.key] !== undefined) {
+            c.innerText = data.week[c.dataset.key];
+            applyCategory(c);
+          }
+        });
+      }
+      // Apply month (only rendered)
+      if (data.month) {
+        document.querySelectorAll('.month-cell .memo').forEach(m => {
+          if (data.month[m.dataset.key] !== undefined) {
+            m.innerText = data.month[m.dataset.key];
+            applyCategory(m.parentElement);
+          }
+        });
+      }
+      if (data.size) document.getElementById('sch-size').value = data.size;
+      if (data.font) document.getElementById('sch-font').value = data.font;
+      applySize();
+      document.getElementById('sch-status').textContent = '이전 작업 불러옴';
+      return data;
+    } catch (e) { return null; }
+  }
+
+  function applyMonthFromStore() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.month) {
+        document.querySelectorAll('.month-cell .memo').forEach(m => {
+          if (data.month[m.dataset.key] !== undefined) {
+            m.innerText = data.month[m.dataset.key];
+            applyCategory(m.parentElement);
+          }
+        });
+      }
+    } catch(e) {}
+  }
+
+  function applySize() {
+    const size = document.getElementById('sch-size').value;
+    const font = document.getElementById('sch-font').value;
+    document.querySelectorAll('.week-cell').forEach(c => {
+      c.style.minHeight = size + 'px';
+      c.style.fontSize = font + 'px';
+    });
+    document.querySelectorAll('.month-cell').forEach(c => {
+      c.style.minHeight = (parseInt(size) + 30) + 'px';
+    });
+    document.querySelectorAll('.month-cell .memo').forEach(m => {
+      m.style.fontSize = (parseInt(font) - 1) + 'px';
+    });
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const v = t.dataset.view;
+      document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+      document.getElementById('view-' + v).classList.add('active');
+    });
+  });
+
+  // Toolbar
+  document.getElementById('sch-size').addEventListener('input', () => { applySize(); scheduleSave(); });
+  document.getElementById('sch-font').addEventListener('input', () => { applySize(); scheduleSave(); });
+  document.getElementById('sch-save').addEventListener('click', autoSave);
+
+  document.getElementById('sch-reset').addEventListener('click', () => {
+    if (confirm('주간 시간표를 초기 루틴으로 되돌릴까요? (월간 메모는 유지됩니다)')) {
+      buildWeekGrid();
+      autoSave();
+    }
+  });
+
+  document.getElementById('sch-clear').addEventListener('click', () => {
+    const activeView = document.querySelector('.tab.active').dataset.view;
+    if (activeView === 'week') {
+      if (confirm('주간 시간표를 모두 비울까요?')) {
+        document.querySelectorAll('.week-cell').forEach(c => {
+          c.innerText = '';
+          applyCategory(c);
+        });
+        autoSave();
+      }
+    } else {
+      if (confirm('이 달의 모든 메모를 비울까요?')) {
+        document.querySelectorAll('.month-cell .memo').forEach(m => {
+          m.innerText = '';
+          applyCategory(m.parentElement);
+        });
+        autoSave();
+      }
+    }
+  });
+
+  document.getElementById('sch-export').addEventListener('click', async () => {
+    const lines = [];
+    lines.push('=== 주간 시간표 ===');
+    TIME_SLOTS.forEach(slot => {
+      lines.push(`\n[${slot.label}–${slot.sub}]`);
+      DAYS.forEach((d, i) => {
+        const c = document.querySelector(`[data-key="${slot.id}-${i}"]`);
+        const txt = c ? c.innerText.trim() : '';
+        if (txt) lines.push(`${d.kr}: ${txt.replace(/\n/g, ' ')}`);
+      });
+    });
+    lines.push(`\n=== ${viewYear}년 ${viewMonth+1}월 메모 ===`);
+    document.querySelectorAll('.month-cell:not(.other-month)').forEach(c => {
+      const num = c.querySelector('.date-num').textContent;
+      const memo = c.querySelector('.memo').innerText.trim();
+      if (memo) lines.push(`${num}일: ${memo.replace(/\n/g, ' ')}`);
+    });
+    const text = lines.join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      document.getElementById('sch-status').textContent = '클립보드에 복사됨';
+    } catch {
+      prompt('아래 텍스트를 복사하세요:', text);
+    }
+  });
+
+  document.getElementById('sch-print').addEventListener('click', () => window.print());
+
+  // Month nav
+  document.getElementById('month-prev').addEventListener('click', () => {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    buildMonthGrid();
+    applyMonthFromStore();
+  });
+  document.getElementById('month-next').addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    buildMonthGrid();
+    applyMonthFromStore();
+  });
+
+  // Init
+  const now = new Date();
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+
+  buildWeekGrid();
+  buildMonthGrid();
+  loadData();
+})();
+</script>
+
+</body>
+</html>
